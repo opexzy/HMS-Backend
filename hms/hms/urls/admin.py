@@ -18,5 +18,6 @@ from django.urls import path, include
 urlpatterns = [
     path('auth/',include(('hms_auth.urls','auth'), namespace='auth')),
     path('staff/',include(('staff.urls','staff'), namespace='staff')),
+    path('reservation/',include(('reservation.urls','reservation'), namespace='reservation')),
     #path('customer/',include(('customer.urls','customer'), namespace='customer')),
 ]

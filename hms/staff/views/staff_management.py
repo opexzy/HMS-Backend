@@ -68,7 +68,7 @@ def register_staff(request):
 """
 @request_data_normalizer #Normalize request POST and GET data
 @api_view(['POST']) #Only accept get request
-#@use_permission(CAN_VIEW_STAFF) #Only staff that can view a new staff
+@use_permission(CAN_VIEW_STAFF) #Only staff that can view a new staff
 def list_staff(request, page):
     #Copy dict data
     data = request._POST

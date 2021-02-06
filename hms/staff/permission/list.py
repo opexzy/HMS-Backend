@@ -4,8 +4,12 @@
 
 """ BASIC PERMISSIONS """
 #
-#This permission is required to register new customer
-CAN_MAKE_RESERVATION = 'can_make_reservations'
+#This permission is required to register new reservation
+CAN_MAKE_RESERVATION = 'can_make_reservation'
+
+#
+#This permission is required to view reservation
+CAN_VIEW_RESERVATION = 'can_view_reservation'
 
 
 """ MANAGEMENT PERMISSIONS """
