@@ -160,26 +160,17 @@ def list_reservation(request, page):
 
 
 """
-    Update Staff
+    get Reservation details
 """
 @request_data_normalizer #Normalize request POST and GET data
-@api_view(['POST']) #Only accept post request
-#@use_permission(CAN_EDIT_STAFF) #Only staff that can view a new staff
-def update_staff(request): 
-    #Copy dict data
-    data = dict(request._POST)
+@api_view(['GET']) #Only accept post request
+def get_reservation(request, reference): 
+
     try:
-        staff = StaffModel.objects.get(pk=data.get("id",None))
-        try:
-            staff.first_name = data.get("first_name", None)
-            staff.last_name = data.get("last_name", None)
-            staff.gender = data.get("gender", None)
-            staff.phone_number = data.get("phone_number", None)
-            staff.position = data.get("position", None)
-            staff.save()
-            #TODO: Send mail informing staff about new profile updates
-            return Response(response_maker(response_type='success',message='Staff Profile updated successfully'),status=HTTP_200_OK)
-        except Exception:
-            return Response(response_maker(response_type='error',message='Request not understood'),status=HTTP_400_BAD_REQUEST)
+        reservation = ReservationModel.manage.get(reference=reference)
+        res_serializer = ReservationSerializer(reservation)
+        return Response(response_maker(response_type='success',message='Customer Reservations',
+            data=res_serializer.data),status=HTTP_200_OK)
     except StaffModel.DoesNotExist:
-        return Response(response_maker(response_type='error',message='Request not understood'),status=HTTP_400_BAD_REQUEST)
+        return Response(response_maker(response_type='error',message='Reservation deos not exist'),status=HTTP_400_BAD_REQUEST)
+

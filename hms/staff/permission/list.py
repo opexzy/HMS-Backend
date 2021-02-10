@@ -6,10 +6,18 @@
 #
 #This permission is required to register new reservation
 CAN_MAKE_RESERVATION = 'can_make_reservation'
-
 #
 #This permission is required to view reservation
 CAN_VIEW_RESERVATION = 'can_view_reservation'
+#
+#This permission is required to view room
+CAN_VIEW_ROOM = 'can_view_room'
+#
+#This permission is required to book room
+CAN_BOOK_ROOM = 'can_book_room'
+#
+#This permission is required to book room
+CAN_VIEW_BOOKING = 'can_view_booking'
 
 
 """ MANAGEMENT PERMISSIONS """
@@ -17,6 +25,35 @@ CAN_VIEW_RESERVATION = 'can_view_reservation'
 #This permission is required to edit customer
 CAN_EDIT_CUSTOMER = 'can_edit_customer'
 #
+#This permission is required to add food
+CAN_ADD_FOOD = 'can_add_food'
+#
+#This permission is required to edit food
+CAN_EDIT_FOOD = 'can_edit_food'
+#
+#This permission is required to add food
+CAN_VIEW_FOOD = 'can_view_food'
+#
+#This permission is required to order food
+CAN_PLACE_FOOD_ORDER = 'can_place_food_order'
+#
+#This permission is required to order food
+CAN_VIEW_FOOD_ORDER = 'can_view_food_order'
+#
+#This permission is required to add drink
+CAN_ADD_DRINK = 'can_add_drink'
+#
+#This permission is required to edit drink
+CAN_EDIT_DRINK = 'can_edit_drink'
+#
+#This permission is required to add drink
+CAN_VIEW_DRINK = 'can_view_drink'
+#
+#This permission is required to order drink
+CAN_PLACE_DRINK_ORDER = 'can_place_drink_order'
+#
+#This permission is required to order drink
+CAN_VIEW_DRINK_ORDER = 'can_view_drink_order'
 
 """ ADMINISTRATIVE PERMISSIONS """
 #
@@ -31,3 +68,13 @@ CAN_EDIT_STAFF = 'can_edit_staff'
 #
 #This permission is required to edit staff permissions
 CAN_EDIT_STAFF_PERMISSION = 'can_edit_staff_permission'
+#
+#This permission is required to add new Room
+CAN_ADD_ROOM = 'can_add_room'
+#
+#This permission is required to edit Room
+CAN_EDIT_ROOM = 'can_edit_room'
+#
+#This permission is required to delete Room
+CAN_DELETE_ROOM = 'can_delete_room'
+

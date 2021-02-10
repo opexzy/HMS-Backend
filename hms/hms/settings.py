@@ -48,7 +48,10 @@ INSTALLED_APPS = [
     # Custom App
     'hms_auth',
     'staff',
-    'reservation'
+    'reservation',
+    'room',
+    'bar',
+    'kitchen',
 ]
 
 MIDDLEWARE = [

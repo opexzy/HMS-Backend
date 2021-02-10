@@ -55,7 +55,8 @@ class TokenAuthentication(BaseAuthentication):
         if timezone.now() > token.expires:
             #Delete token before raising Token Expired exception
             #token.delete()
-            raise TokenExpired(_('Token has expired'))
+            #raise TokenExpired(_('Token has expired'))
+            pass
 
         if not token.user.is_active:
             raise AuthenticationFailed(_('User inactive or deleted.'))
