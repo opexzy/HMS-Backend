@@ -29,9 +29,11 @@ from decimal import Decimal
 @request_data_normalizer #Normalize request POST and GET data
 @api_view(['POST']) #Only accept post request
 #@use_permission(CAN_PLACE_FOOD_ORDER)
-def quick_order(request): 
+def quick_order(request, reference): 
     #Copy dict data
     data = dict(request._POST)
+    print(str(data))
+    exit()
     #Add new Room to database
     try:
         with transaction.atomic():

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 05, 2021 at 08:41 PM
+-- Generation Time: Feb 10, 2021 at 03:31 PM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.4
 
@@ -122,7 +122,35 @@ INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALU
 (45, 'Can add staff permission model', 12, 'add_staffpermissionmodel'),
 (46, 'Can change staff permission model', 12, 'change_staffpermissionmodel'),
 (47, 'Can delete staff permission model', 12, 'delete_staffpermissionmodel'),
-(48, 'Can view staff permission model', 12, 'view_staffpermissionmodel');
+(48, 'Can view staff permission model', 12, 'view_staffpermissionmodel'),
+(49, 'Can add reservation model', 13, 'add_reservationmodel'),
+(50, 'Can change reservation model', 13, 'change_reservationmodel'),
+(51, 'Can delete reservation model', 13, 'delete_reservationmodel'),
+(52, 'Can view reservation model', 13, 'view_reservationmodel'),
+(53, 'Can add room model', 14, 'add_roommodel'),
+(54, 'Can change room model', 14, 'change_roommodel'),
+(55, 'Can delete room model', 14, 'delete_roommodel'),
+(56, 'Can view room model', 14, 'view_roommodel'),
+(57, 'Can add booking record model', 15, 'add_bookingrecordmodel'),
+(58, 'Can change booking record model', 15, 'change_bookingrecordmodel'),
+(59, 'Can delete booking record model', 15, 'delete_bookingrecordmodel'),
+(60, 'Can view booking record model', 15, 'view_bookingrecordmodel'),
+(61, 'Can add drink model', 16, 'add_drinkmodel'),
+(62, 'Can change drink model', 16, 'change_drinkmodel'),
+(63, 'Can delete drink model', 16, 'delete_drinkmodel'),
+(64, 'Can view drink model', 16, 'view_drinkmodel'),
+(65, 'Can add drink order model', 17, 'add_drinkordermodel'),
+(66, 'Can change drink order model', 17, 'change_drinkordermodel'),
+(67, 'Can delete drink order model', 17, 'delete_drinkordermodel'),
+(68, 'Can view drink order model', 17, 'view_drinkordermodel'),
+(69, 'Can add food model', 18, 'add_foodmodel'),
+(70, 'Can change food model', 18, 'change_foodmodel'),
+(71, 'Can delete food model', 18, 'delete_foodmodel'),
+(72, 'Can view food model', 18, 'view_foodmodel'),
+(73, 'Can add food order model', 19, 'add_foodordermodel'),
+(74, 'Can change food order model', 19, 'change_foodordermodel'),
+(75, 'Can delete food order model', 19, 'delete_foodordermodel'),
+(76, 'Can view food order model', 19, 'view_foodordermodel');
 
 -- --------------------------------------------------------
 
@@ -163,9 +191,16 @@ INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES
 (2, 'auth', 'permission'),
 (6, 'authtoken', 'token'),
 (7, 'authtoken', 'tokenproxy'),
+(16, 'bar', 'drinkmodel'),
+(17, 'bar', 'drinkordermodel'),
 (4, 'contenttypes', 'contenttype'),
 (8, 'hms_auth', 'authmodel'),
 (9, 'hms_auth', 'authtokenmodel'),
+(18, 'kitchen', 'foodmodel'),
+(19, 'kitchen', 'foodordermodel'),
+(13, 'reservation', 'reservationmodel'),
+(15, 'room', 'bookingrecordmodel'),
+(14, 'room', 'roommodel'),
 (5, 'sessions', 'session'),
 (10, 'staff', 'permissionmodel'),
 (11, 'staff', 'staffmodel'),
@@ -211,7 +246,29 @@ INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
 (20, 'authtoken', '0002_auto_20160226_1747', '2021-01-26 09:36:03.783068'),
 (21, 'authtoken', '0003_tokenproxy', '2021-01-26 09:36:03.857382'),
 (22, 'sessions', '0001_initial', '2021-01-26 09:36:04.634649'),
-(23, 'staff', '0001_initial', '2021-01-26 09:36:05.951534');
+(23, 'staff', '0001_initial', '2021-01-26 09:36:05.951534'),
+(24, 'hms_auth', '0002_auto_20210206_1219', '2021-02-06 11:21:15.976681'),
+(25, 'hms_auth', '0003_auto_20210206_1221', '2021-02-06 11:21:16.050122'),
+(26, 'reservation', '0001_initial', '2021-02-06 11:21:17.745679'),
+(27, 'hms_auth', '0004_auto_20210206_1534', '2021-02-06 14:34:38.932229'),
+(28, 'reservation', '0002_reservationmodel_gender', '2021-02-06 14:34:41.939932'),
+(29, 'hms_auth', '0005_auto_20210206_1613', '2021-02-06 15:14:04.247656'),
+(30, 'reservation', '0003_auto_20210206_1613', '2021-02-06 15:14:04.332620'),
+(31, 'hms_auth', '0006_auto_20210206_1622', '2021-02-06 15:22:40.885832'),
+(32, 'reservation', '0004_auto_20210206_1622', '2021-02-06 15:22:41.545666'),
+(33, 'hms_auth', '0007_auto_20210208_1432', '2021-02-08 13:32:20.224323'),
+(34, 'room', '0001_initial', '2021-02-08 13:32:21.565656'),
+(35, 'hms_auth', '0008_auto_20210209_1027', '2021-02-09 09:27:17.880840'),
+(36, 'room', '0002_auto_20210209_1027', '2021-02-09 09:27:18.041925'),
+(37, 'hms_auth', '0009_auto_20210209_1302', '2021-02-09 12:02:29.412323'),
+(38, 'room', '0003_bookingrecordmodel_status', '2021-02-09 12:02:30.774337'),
+(39, 'hms_auth', '0010_auto_20210209_1321', '2021-02-09 12:21:44.617844'),
+(40, 'room', '0004_auto_20210209_1321', '2021-02-09 12:21:45.079016'),
+(41, 'hms_auth', '0011_auto_20210209_1322', '2021-02-09 12:23:03.026581'),
+(42, 'room', '0005_auto_20210209_1322', '2021-02-09 12:23:03.115093'),
+(43, 'bar', '0001_initial', '2021-02-09 20:43:07.792260'),
+(44, 'hms_auth', '0012_auto_20210209_2142', '2021-02-09 20:43:20.985172'),
+(45, 'kitchen', '0001_initial', '2021-02-09 20:43:22.659119');
 
 -- --------------------------------------------------------
 
@@ -267,7 +324,125 @@ CREATE TABLE `hms_auth_token` (
 --
 
 INSERT INTO `hms_auth_token` (`key`, `created`, `expires`, `user_id`) VALUES
-('181fabe9c716b2c88f873062883105e66ab46984', '2021-02-05 19:12:23.212243', '2021-02-05 19:39:27.186146', 1);
+('e69c62840d9356341d944917ea6a23051c61325d', '2021-02-10 10:03:18.866676', '2021-02-10 14:45:19.024983', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_booking_record`
+--
+
+CREATE TABLE `hms_booking_record` (
+  `timestamp` datetime(6) NOT NULL,
+  `id` bigint(20) NOT NULL,
+  `amount` decimal(20,2) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `check_in` date NOT NULL,
+  `check_out` date NOT NULL,
+  `reservation_id` bigint(20) NOT NULL,
+  `room_id` bigint(20) NOT NULL,
+  `status` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_booking_record`
+--
+
+INSERT INTO `hms_booking_record` (`timestamp`, `id`, `amount`, `quantity`, `check_in`, `check_out`, `reservation_id`, `room_id`, `status`) VALUES
+('2021-02-09 12:33:01.063051', 1, '29000.00', 1, '2021-02-09', '2021-02-11', 2, 2, 'active');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_drink`
+--
+
+CREATE TABLE `hms_drink` (
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `price` decimal(20,2) NOT NULL,
+  `metric` varchar(255) NOT NULL,
+  `available` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_drink`
+--
+
+INSERT INTO `hms_drink` (`id`, `name`, `description`, `price`, `metric`, `available`) VALUES
+(1, 'Mocha Edited', 'A Bottle of Mocha Drink', '6550.00', 'bottle', 12);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_drink_order`
+--
+
+CREATE TABLE `hms_drink_order` (
+  `id` bigint(20) NOT NULL,
+  `amount` decimal(20,2) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `status` varchar(15) NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
+  `drink_id` bigint(20) NOT NULL,
+  `registered_by_id` int(11) NOT NULL,
+  `reservation_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_drink_order`
+--
+
+INSERT INTO `hms_drink_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `drink_id`, `registered_by_id`, `reservation_id`) VALUES
+(1, '32750.00', 5, 'completed', '2021-02-10 09:16:45.639015', 1, 1, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_food`
+--
+
+CREATE TABLE `hms_food` (
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `price` decimal(20,2) NOT NULL,
+  `metric` varchar(255) NOT NULL,
+  `available` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_food`
+--
+
+INSERT INTO `hms_food` (`id`, `name`, `description`, `price`, `metric`, `available`) VALUES
+(1, 'Fried Rice Edited', 'Fried rice and Chicken', '1500.00', 'plate', 52),
+(2, 'Jollof Rice', 'Jollof rice and Chicken', '1200.00', 'plate', 54);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_food_order`
+--
+
+CREATE TABLE `hms_food_order` (
+  `id` bigint(20) NOT NULL,
+  `amount` decimal(20,2) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `status` varchar(15) NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
+  `food_id` bigint(20) NOT NULL,
+  `registered_by_id` int(11) NOT NULL,
+  `reservation_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_food_order`
+--
+
+INSERT INTO `hms_food_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `food_id`, `registered_by_id`, `reservation_id`) VALUES
+(3, '3000.00', 2, 'completed', '2021-02-09 22:44:47.954503', 1, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -290,9 +465,78 @@ INSERT INTO `hms_permission` (`id`, `display_name`, `name`, `category`) VALUES
 (1, 'Add Staff', 'can_add_staff', 'admin'),
 (2, 'View Staffs', 'can_view_staff', 'admin'),
 (3, 'Edit Staff', 'can_edit_staff', 'admin'),
-(4, 'Create Reservation', 'can_create_reservation', 'basic'),
+(4, 'Make Reservation', 'can_make_reservation', 'basic'),
 (5, 'View EOD', 'can_view_eod', 'management'),
-(6, 'Edit Staff Permission', 'can_edit_staff_permission', 'admin');
+(6, 'Edit Staff Permission', 'can_edit_staff_permission', 'admin'),
+(7, 'View Reservation', 'can_view_reservation', 'basic'),
+(8, 'Add Room', 'can_add_room', 'admin'),
+(9, 'Edit Room', 'can_edit_room', 'admin'),
+(10, 'Delete Room', 'can_delete_room', 'admin'),
+(11, 'View Room', 'can_view_room', 'basic'),
+(12, 'Book Room', 'can_book_room', 'basic'),
+(13, 'View Room Booking', 'can_view_booking', 'basic'),
+(14, 'Add Food', 'can_add_food', 'management'),
+(15, 'Edit Food', 'can_edit_food', 'management'),
+(16, 'View Food', 'can_view_food', 'management'),
+(17, 'Place Food Order', 'can_place_food_order', 'management'),
+(18, 'View Food Order', 'can_view_food_order', 'management'),
+(19, 'Add Drink', 'can_add_drink', 'management'),
+(20, 'View Drink', 'can_view_drink', 'management'),
+(21, 'Edit Drink', 'can_edit_drink', 'management'),
+(22, 'Place Drink Order', 'can_place_drink_order', 'management'),
+(23, 'View Drink Order', 'can_view_drink_order', 'management');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_reservation`
+--
+
+CREATE TABLE `hms_reservation` (
+  `id` bigint(20) NOT NULL,
+  `reference` varchar(12) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `phone_number` varchar(15) NOT NULL,
+  `status` varchar(15) NOT NULL,
+  `credit_balance` decimal(20,2) NOT NULL,
+  `amount_spent` decimal(20,2) NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
+  `created_by_id` int(11) DEFAULT NULL,
+  `gender` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_reservation`
+--
+
+INSERT INTO `hms_reservation` (`id`, `reference`, `first_name`, `last_name`, `phone_number`, `status`, `credit_balance`, `amount_spent`, `timestamp`, `created_by_id`, `gender`) VALUES
+(1, 'BF3HKO5OTS2N', 'Opeyemi', 'Akosile', '08065546736', 'active', '65000.00', '0.00', '2021-02-06 15:22:54.981909', 1, 'male'),
+(2, 'KSRELQR4HJ2Y', 'Jerome', 'Coleman', '09065551148', 'active', '150000.00', '64750.00', '2021-02-10 09:16:45.774377', 1, 'male');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_room`
+--
+
+CREATE TABLE `hms_room` (
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `price` decimal(20,2) NOT NULL,
+  `start_no` int(11) NOT NULL,
+  `end_no` int(11) NOT NULL,
+  `available` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_room`
+--
+
+INSERT INTO `hms_room` (`id`, `name`, `description`, `price`, `start_no`, `end_no`, `available`) VALUES
+(1, 'Deluxe Room', 'Just another Deluxe Room', '24500.00', 100, 109, 10),
+(2, 'Standard Room', 'Just another Standard Room', '14500.00', 200, 209, 9);
 
 -- --------------------------------------------------------
 
@@ -316,7 +560,7 @@ CREATE TABLE `hms_staff` (
 --
 
 INSERT INTO `hms_staff` (`id`, `first_name`, `last_name`, `gender`, `phone_number`, `position`, `avatar`, `auth_id`) VALUES
-(1, 'Opeyemi', 'Akosile', 'male', '07065551148', 'Manager', NULL, 1),
+(1, 'Opeyemi', 'Akosile', 'male', '08076567677', 'Administrator', '', 1),
 (2, 'Samuel', 'Opeyemi', 'male', '0907383783', 'Account Officer', '', 3);
 
 -- --------------------------------------------------------
@@ -340,7 +584,25 @@ INSERT INTO `hms_staff_permission` (`id`, `date_asigned`, `permission_id`, `staf
 (1, '2021-02-05 18:23:39.056509', 1, 1),
 (2, '2021-02-05 18:23:39.165007', 2, 1),
 (3, '2021-02-05 18:23:39.225349', 3, 1),
-(4, '2021-02-05 18:23:39.428985', 6, 1);
+(4, '2021-02-05 18:23:39.428985', 6, 1),
+(5, '2021-02-06 14:53:10.605922', 4, 1),
+(6, '2021-02-06 14:53:10.677777', 7, 1),
+(7, '2021-02-08 15:46:21.585217', 8, 1),
+(8, '2021-02-08 15:46:21.625593', 9, 1),
+(9, '2021-02-08 15:46:21.702867', 10, 1),
+(10, '2021-02-09 09:08:32.068313', 11, 1),
+(11, '2021-02-09 12:19:32.529266', 12, 1),
+(12, '2021-02-09 15:14:27.230574', 13, 1),
+(13, '2021-02-09 21:16:26.804764', 14, 1),
+(14, '2021-02-09 21:16:26.857777', 15, 1),
+(15, '2021-02-09 21:16:26.889020', 16, 1),
+(16, '2021-02-09 22:37:07.053218', 17, 1),
+(17, '2021-02-09 22:37:07.113142', 18, 1),
+(18, '2021-02-10 08:12:12.427568', 19, 1),
+(19, '2021-02-10 08:12:12.502368', 20, 1),
+(20, '2021-02-10 08:12:12.660020', 21, 1),
+(21, '2021-02-10 08:12:12.756563', 22, 1),
+(22, '2021-02-10 08:12:12.812119', 23, 1);
 
 --
 -- Indexes for dumped tables
@@ -418,10 +680,65 @@ ALTER TABLE `hms_auth_token`
   ADD UNIQUE KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `hms_booking_record`
+--
+ALTER TABLE `hms_booking_record`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `hms_booking_record_reservation_id_50bc3b67_fk_hms_reservation_id` (`reservation_id`),
+  ADD KEY `hms_booking_record_room_id_1f99642b_fk_hms_room_id` (`room_id`);
+
+--
+-- Indexes for table `hms_drink`
+--
+ALTER TABLE `hms_drink`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `hms_drink_order`
+--
+ALTER TABLE `hms_drink_order`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `hms_drink_order_drink_id_a75367a7_fk_hms_drink_id` (`drink_id`),
+  ADD KEY `hms_drink_order_registered_by_id_925d406a_fk_hms_staff_id` (`registered_by_id`),
+  ADD KEY `hms_drink_order_reservation_id_641704bb_fk_hms_reservation_id` (`reservation_id`);
+
+--
+-- Indexes for table `hms_food`
+--
+ALTER TABLE `hms_food`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `hms_food_order`
+--
+ALTER TABLE `hms_food_order`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `hms_food_order_food_id_f4f33934_fk_hms_food_id` (`food_id`),
+  ADD KEY `hms_food_order_registered_by_id_7ec240c7_fk_hms_staff_id` (`registered_by_id`),
+  ADD KEY `hms_food_order_reservation_id_1abcddc8_fk_hms_reservation_id` (`reservation_id`);
+
+--
 -- Indexes for table `hms_permission`
 --
 ALTER TABLE `hms_permission`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `hms_reservation`
+--
+ALTER TABLE `hms_reservation`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `hms_reservation_reference_40a5d0eb_uniq` (`reference`),
+  ADD KEY `hms_reservation_created_by_id_9aec3e14_fk_hms_staff_id` (`created_by_id`);
+
+--
+-- Indexes for table `hms_room`
+--
+ALTER TABLE `hms_room`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `hms_staff`
@@ -458,7 +775,7 @@ ALTER TABLE `auth_group_permissions`
 -- AUTO_INCREMENT for table `auth_permission`
 --
 ALTER TABLE `auth_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- AUTO_INCREMENT for table `django_admin_log`
@@ -470,13 +787,13 @@ ALTER TABLE `django_admin_log`
 -- AUTO_INCREMENT for table `django_content_type`
 --
 ALTER TABLE `django_content_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `django_migrations`
 --
 ALTER TABLE `django_migrations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `hms_auth`
@@ -485,10 +802,52 @@ ALTER TABLE `hms_auth`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `hms_booking_record`
+--
+ALTER TABLE `hms_booking_record`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `hms_drink`
+--
+ALTER TABLE `hms_drink`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `hms_drink_order`
+--
+ALTER TABLE `hms_drink_order`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `hms_food`
+--
+ALTER TABLE `hms_food`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `hms_food_order`
+--
+ALTER TABLE `hms_food_order`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `hms_permission`
 --
 ALTER TABLE `hms_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `hms_reservation`
+--
+ALTER TABLE `hms_reservation`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `hms_room`
+--
+ALTER TABLE `hms_room`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `hms_staff`
@@ -500,7 +859,7 @@ ALTER TABLE `hms_staff`
 -- AUTO_INCREMENT for table `hms_staff_permission`
 --
 ALTER TABLE `hms_staff_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Constraints for dumped tables
@@ -537,6 +896,35 @@ ALTER TABLE `django_admin_log`
 --
 ALTER TABLE `hms_auth_token`
   ADD CONSTRAINT `hms_auth_token_user_id_e05f02f2_fk_hms_auth_id` FOREIGN KEY (`user_id`) REFERENCES `hms_auth` (`id`);
+
+--
+-- Constraints for table `hms_booking_record`
+--
+ALTER TABLE `hms_booking_record`
+  ADD CONSTRAINT `hms_booking_record_reservation_id_50bc3b67_fk_hms_reservation_id` FOREIGN KEY (`reservation_id`) REFERENCES `hms_reservation` (`id`),
+  ADD CONSTRAINT `hms_booking_record_room_id_1f99642b_fk_hms_room_id` FOREIGN KEY (`room_id`) REFERENCES `hms_room` (`id`);
+
+--
+-- Constraints for table `hms_drink_order`
+--
+ALTER TABLE `hms_drink_order`
+  ADD CONSTRAINT `hms_drink_order_drink_id_a75367a7_fk_hms_drink_id` FOREIGN KEY (`drink_id`) REFERENCES `hms_drink` (`id`),
+  ADD CONSTRAINT `hms_drink_order_registered_by_id_925d406a_fk_hms_staff_id` FOREIGN KEY (`registered_by_id`) REFERENCES `hms_staff` (`id`),
+  ADD CONSTRAINT `hms_drink_order_reservation_id_641704bb_fk_hms_reservation_id` FOREIGN KEY (`reservation_id`) REFERENCES `hms_reservation` (`id`);
+
+--
+-- Constraints for table `hms_food_order`
+--
+ALTER TABLE `hms_food_order`
+  ADD CONSTRAINT `hms_food_order_food_id_f4f33934_fk_hms_food_id` FOREIGN KEY (`food_id`) REFERENCES `hms_food` (`id`),
+  ADD CONSTRAINT `hms_food_order_registered_by_id_7ec240c7_fk_hms_staff_id` FOREIGN KEY (`registered_by_id`) REFERENCES `hms_staff` (`id`),
+  ADD CONSTRAINT `hms_food_order_reservation_id_1abcddc8_fk_hms_reservation_id` FOREIGN KEY (`reservation_id`) REFERENCES `hms_reservation` (`id`);
+
+--
+-- Constraints for table `hms_reservation`
+--
+ALTER TABLE `hms_reservation`
+  ADD CONSTRAINT `hms_reservation_created_by_id_9aec3e14_fk_hms_staff_id` FOREIGN KEY (`created_by_id`) REFERENCES `hms_staff` (`id`);
 
 --
 -- Constraints for table `hms_staff`
