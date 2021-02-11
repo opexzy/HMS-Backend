@@ -171,6 +171,6 @@ def get_reservation(request, reference):
         res_serializer = ReservationSerializer(reservation)
         return Response(response_maker(response_type='success',message='Customer Reservations',
             data=res_serializer.data),status=HTTP_200_OK)
-    except StaffModel.DoesNotExist:
+    except Exception:
         return Response(response_maker(response_type='error',message='Reservation deos not exist'),status=HTTP_400_BAD_REQUEST)
 

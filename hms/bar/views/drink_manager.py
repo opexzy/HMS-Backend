@@ -144,17 +144,23 @@ def order_drink(request):
                 return Response(response_maker(response_type='error',message='Avaialble Drinks Less Than Quantity'),status=HTTP_400_BAD_REQUEST)
             #Add Food Order
             if data.get("order_mode") == "direct":
-                status = DrinkOrderModel.Status.COMPLETED
+                order = DrinkOrderModel(
+                    reservation=reservation,
+                    drink=drink,
+                    amount=data.get('amount'),
+                    quantity=data.get('quantity'),
+                    completed_by=StaffModel.objects.get(auth=request.user),
+                    status=DrinkOrderModel.Status.COMPLETED
+                )
             else:
-                status = DrinkOrderModel.Status.PENDING
-            order = DrinkOrderModel(
-                reservation=reservation,
-                drink=drink,
-                amount=data.get('amount'),
-                quantity=data.get('quantity'),
-                registered_by=StaffModel.objects.get(auth=request.user),
-                status=status
-            )
+                order = DrinkOrderModel(
+                    reservation=reservation,
+                    drink=drink,
+                    amount=data.get('amount'),
+                    quantity=data.get('quantity'),
+                    registered_by=StaffModel.objects.get(auth=request.user),
+                    status=DrinkOrderModel.Status.PENDING
+                )
             order.save()
             #Add cost to reservation amount spent
             reservation.amount_spent = reservation.amount_spent + Decimal(float(order.amount))
@@ -260,3 +266,44 @@ def get_all_drinks(request):
             data=drink_serializer.data),status=HTTP_200_OK)
     except Exception:
         return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)
+
+
+"""
+    Update drink order status
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+@use_permission(CAN_PLACE_DRINK_ORDER)
+def update_order(request): 
+    #Copy dict data
+    data = dict(request._POST)
+    #Add new Room to database
+    try:
+        with transaction.atomic():
+            drink_order = DrinkOrderModel.manage.get(id=data.get('id'))
+            staff = StaffModel.objects.get(auth=request.user)
+            if drink_order.status == DrinkOrderModel.Status.PENDING:
+                if data.get("status") == DrinkOrderModel.Status.COMPLETED:
+                    drink_order.status = DrinkOrderModel.Status.COMPLETED
+                    drink_order.completed_by = staff
+                    drink_order.save()
+                elif data.get("status") == DrinkOrderModel.Status.CANCELED:
+                    drink_order.status = DrinkOrderModel.Status.CANCELED
+                    drink_order.completed_by = staff
+                    drink_order.save()
+                    #Upadte available food in the food model
+                    drink_order.drink.available = drink_order.drink.available + drink_order.quantity
+                    drink_order.drink.save()
+                    #Update amount spent
+                    drink_order.reservation.amount_spent = drink_order.reservation.amount_spent - drink_order.amount
+                    drink_order.reservation.save()
+                else:
+                    return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+                return Response(response_maker(response_type='success',message="Drink Order Canceled successfully"),status=HTTP_200_OK)
+            else:
+                return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+            #Add Food Order
+    except KeyError:
+        return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)

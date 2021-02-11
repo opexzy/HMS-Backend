@@ -127,7 +127,7 @@ def update_food(request):
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
 
 """
-    Book a Room
+    Order a Food
 """
 @request_data_normalizer #Normalize request POST and GET data
 @api_view(['POST']) #Only accept post request
@@ -145,17 +145,23 @@ def order_food(request):
                 return Response(response_maker(response_type='error',message='Avaialble Food Less Than Quantity'),status=HTTP_400_BAD_REQUEST)
             #Add Food Order
             if data.get("order_mode") == "direct":
-                status = FoodOrderModel.Status.COMPLETED
+                order = FoodOrderModel(
+                    reservation=reservation,
+                    food=food,
+                    amount=data.get('amount'),
+                    quantity=data.get('quantity'),
+                    completed_by=StaffModel.objects.get(auth=request.user),
+                    status=FoodOrderModel.Status.COMPLETED
+                )
             else:
-                status = FoodOrderModel.Status.PENDING
-            order = FoodOrderModel(
-                reservation=reservation,
-                food=food,
-                amount=data.get('amount'),
-                quantity=data.get('quantity'),
-                registered_by=StaffModel.objects.get(auth=request.user),
-                status=status
-            )
+                order = FoodOrderModel(
+                    reservation=reservation,
+                    food=food,
+                    amount=data.get('amount'),
+                    quantity=data.get('quantity'),
+                    registered_by=StaffModel.objects.get(auth=request.user),
+                    status=FoodOrderModel.Status.PENDING
+                )
             order.save()
             #Add cost to reservation amount spent
             reservation.amount_spent = reservation.amount_spent + Decimal(float(order.amount))
@@ -262,3 +268,43 @@ def get_all_foods(request):
             data=food_serializer.data),status=HTTP_200_OK)
     except Exception:
         return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)
+
+"""
+    Update food order status
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+@use_permission(CAN_PLACE_FOOD_ORDER)
+def update_order(request): 
+    #Copy dict data
+    data = dict(request._POST)
+    #Add new Room to database
+    try:
+        with transaction.atomic():
+            food_order = FoodOrderModel.manage.get(id=data.get('id'))
+            staff = StaffModel.objects.get(auth=request.user)
+            if food_order.status == FoodOrderModel.Status.PENDING:
+                if data.get("status") == FoodOrderModel.Status.COMPLETED:
+                    food_order.status = FoodOrderModel.Status.COMPLETED
+                    food_order.completed_by = staff
+                    food_order.save()
+                elif data.get("status") == FoodOrderModel.Status.CANCELED:
+                    food_order.status = FoodOrderModel.Status.CANCELED
+                    food_order.completed_by = staff
+                    food_order.save()
+                    #Upadte available food in the food model
+                    food_order.food.available = food_order.food.available + food_order.quantity
+                    food_order.food.save()
+                    #Update amount spent
+                    food_order.reservation.amount_spent = food_order.reservation.amount_spent - food_order.amount
+                    food_order.reservation.save()
+                else:
+                    return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+                return Response(response_maker(response_type='success',message="Food Order Canceled successfully"),status=HTTP_200_OK)
+            else:
+                return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+            #Add Food Order
+    except KeyError:
+        return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)

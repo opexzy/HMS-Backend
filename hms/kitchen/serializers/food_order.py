@@ -12,6 +12,7 @@ class FoodOrderSerializer(serializers.ModelSerializer):
     last_name = serializers.SerializerMethodField("get_last_name")
     food = serializers.SerializerMethodField("get_food")
     placed_by = serializers.SerializerMethodField("get_placed_by")
+    finalized_by = serializers.SerializerMethodField("get_finalized_by")
 
     class Meta:
         model = FoodOrderModel
@@ -24,6 +25,7 @@ class FoodOrderSerializer(serializers.ModelSerializer):
             'amount', 
             'quantity', 
             'placed_by',
+            'finalized_by',
             'status',
             'timestamp'
         ]
@@ -55,5 +57,11 @@ class FoodOrderSerializer(serializers.ModelSerializer):
     def get_placed_by(self, obj):
         if obj.registered_by:
             return "{} {}".format(obj.registered_by.first_name, obj.registered_by.last_name)
+        else:
+            return None
+    
+    def get_finalized_by(self, obj):
+        if obj.completed_by:
+            return "{} {}".format(obj.completed_by.first_name, obj.completed_by.last_name)
         else:
             return None

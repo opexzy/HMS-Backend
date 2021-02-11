@@ -41,7 +41,8 @@ class ReservationModel(models.Model):
         super().__init__(*args,**kwargs)
 
     def save(self):
-        self.reference = self.generate_ref()
+        if not self.reference:
+            self.reference = self.generate_ref()
         return super().save()
 
     class Status:

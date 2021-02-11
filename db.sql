@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 10, 2021 at 03:31 PM
+-- Generation Time: Feb 12, 2021 at 12:01 AM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.4
 
@@ -268,7 +268,15 @@ INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
 (42, 'room', '0005_auto_20210209_1322', '2021-02-09 12:23:03.115093'),
 (43, 'bar', '0001_initial', '2021-02-09 20:43:07.792260'),
 (44, 'hms_auth', '0012_auto_20210209_2142', '2021-02-09 20:43:20.985172'),
-(45, 'kitchen', '0001_initial', '2021-02-09 20:43:22.659119');
+(45, 'kitchen', '0001_initial', '2021-02-09 20:43:22.659119'),
+(46, 'bar', '0002_drinkordermodel_completed_by', '2021-02-11 21:49:20.721498'),
+(47, 'hms_auth', '0013_auto_20210211_2246', '2021-02-11 21:49:20.787872'),
+(48, 'hms_auth', '0014_auto_20210211_2249', '2021-02-11 21:49:20.832604'),
+(49, 'kitchen', '0002_foodordermodel_completed_by', '2021-02-11 21:49:22.355104'),
+(50, 'bar', '0003_auto_20210211_2255', '2021-02-11 21:56:08.228068'),
+(51, 'hms_auth', '0015_auto_20210211_2249', '2021-02-11 21:56:08.452741'),
+(52, 'hms_auth', '0016_auto_20210211_2255', '2021-02-11 21:56:08.490464'),
+(53, 'kitchen', '0003_auto_20210211_2255', '2021-02-11 21:56:10.795386');
 
 -- --------------------------------------------------------
 
@@ -324,7 +332,7 @@ CREATE TABLE `hms_auth_token` (
 --
 
 INSERT INTO `hms_auth_token` (`key`, `created`, `expires`, `user_id`) VALUES
-('e69c62840d9356341d944917ea6a23051c61325d', '2021-02-10 10:03:18.866676', '2021-02-10 14:45:19.024983', 1);
+('27db1f77461eb8d1fa1e1a32004cf183b0282677', '2021-02-11 21:12:26.240790', '2021-02-11 23:16:25.407709', 1);
 
 -- --------------------------------------------------------
 
@@ -371,7 +379,7 @@ CREATE TABLE `hms_drink` (
 --
 
 INSERT INTO `hms_drink` (`id`, `name`, `description`, `price`, `metric`, `available`) VALUES
-(1, 'Mocha Edited', 'A Bottle of Mocha Drink', '6550.00', 'bottle', 12);
+(1, 'Mocha Edited', 'A Bottle of Mocha Drink', '6550.00', 'bottle', 6);
 
 -- --------------------------------------------------------
 
@@ -386,16 +394,21 @@ CREATE TABLE `hms_drink_order` (
   `status` varchar(15) NOT NULL,
   `timestamp` datetime(6) NOT NULL,
   `drink_id` bigint(20) NOT NULL,
-  `registered_by_id` int(11) NOT NULL,
-  `reservation_id` bigint(20) NOT NULL
+  `registered_by_id` int(11) DEFAULT NULL,
+  `reservation_id` bigint(20) NOT NULL,
+  `completed_by_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `hms_drink_order`
 --
 
-INSERT INTO `hms_drink_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `drink_id`, `registered_by_id`, `reservation_id`) VALUES
-(1, '32750.00', 5, 'completed', '2021-02-10 09:16:45.639015', 1, 1, 2);
+INSERT INTO `hms_drink_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `drink_id`, `registered_by_id`, `reservation_id`, `completed_by_id`) VALUES
+(1, '32750.00', 5, 'completed', '2021-02-10 09:16:45.639015', 1, 1, 2, NULL),
+(2, '32750.00', 5, 'completed', '2021-02-11 21:13:04.266443', 1, 1, 1, NULL),
+(3, '45850.00', 7, 'canceled', '2021-02-11 22:35:57.653942', 1, 1, 2, 1),
+(4, '32750.00', 5, 'canceled', '2021-02-11 22:48:26.839907', 1, 1, 1, 1),
+(5, '6550.00', 1, 'pending', '2021-02-11 22:59:08.965789', 1, 1, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -417,8 +430,8 @@ CREATE TABLE `hms_food` (
 --
 
 INSERT INTO `hms_food` (`id`, `name`, `description`, `price`, `metric`, `available`) VALUES
-(1, 'Fried Rice Edited', 'Fried rice and Chicken', '1500.00', 'plate', 52),
-(2, 'Jollof Rice', 'Jollof rice and Chicken', '1200.00', 'plate', 54);
+(1, 'Fried Rice Edited', 'Fried rice and Chicken', '1500.00', 'plate', 42),
+(2, 'Jollof Rice', 'Jollof rice and Chicken', '1200.00', 'plate', 44);
 
 -- --------------------------------------------------------
 
@@ -433,16 +446,20 @@ CREATE TABLE `hms_food_order` (
   `status` varchar(15) NOT NULL,
   `timestamp` datetime(6) NOT NULL,
   `food_id` bigint(20) NOT NULL,
-  `registered_by_id` int(11) NOT NULL,
-  `reservation_id` bigint(20) NOT NULL
+  `registered_by_id` int(11) DEFAULT NULL,
+  `reservation_id` bigint(20) NOT NULL,
+  `completed_by_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `hms_food_order`
 --
 
-INSERT INTO `hms_food_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `food_id`, `registered_by_id`, `reservation_id`) VALUES
-(3, '3000.00', 2, 'completed', '2021-02-09 22:44:47.954503', 1, 1, 2);
+INSERT INTO `hms_food_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `food_id`, `registered_by_id`, `reservation_id`, `completed_by_id`) VALUES
+(3, '3000.00', 2, 'completed', '2021-02-09 22:44:47.954503', 1, 1, 2, NULL),
+(5, '16500.00', 11, 'canceled', '2021-02-11 21:30:30.430389', 1, 1, 1, NULL),
+(6, '15000.00', 10, 'completed', '2021-02-11 22:43:16.336172', 1, 1, 2, 1),
+(7, '12000.00', 10, 'completed', '2021-02-11 22:41:08.573791', 2, 1, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -511,8 +528,8 @@ CREATE TABLE `hms_reservation` (
 --
 
 INSERT INTO `hms_reservation` (`id`, `reference`, `first_name`, `last_name`, `phone_number`, `status`, `credit_balance`, `amount_spent`, `timestamp`, `created_by_id`, `gender`) VALUES
-(1, 'BF3HKO5OTS2N', 'Opeyemi', 'Akosile', '08065546736', 'active', '65000.00', '0.00', '2021-02-06 15:22:54.981909', 1, 'male'),
-(2, 'KSRELQR4HJ2Y', 'Jerome', 'Coleman', '09065551148', 'active', '150000.00', '64750.00', '2021-02-10 09:16:45.774377', 1, 'male');
+(1, 'J4SVT8NU0BCT', 'Opeyemi', 'Akosile', '08065546736', 'active', '65000.00', '120050.00', '2021-02-11 22:59:08.981238', 1, 'male'),
+(2, 'KSRELQR4HJ2Y', 'Jerome', 'Coleman', '09065551148', 'active', '150000.00', '91750.00', '2021-02-11 22:35:57.660450', 1, 'male');
 
 -- --------------------------------------------------------
 
@@ -700,8 +717,9 @@ ALTER TABLE `hms_drink`
 ALTER TABLE `hms_drink_order`
   ADD PRIMARY KEY (`id`),
   ADD KEY `hms_drink_order_drink_id_a75367a7_fk_hms_drink_id` (`drink_id`),
-  ADD KEY `hms_drink_order_registered_by_id_925d406a_fk_hms_staff_id` (`registered_by_id`),
-  ADD KEY `hms_drink_order_reservation_id_641704bb_fk_hms_reservation_id` (`reservation_id`);
+  ADD KEY `hms_drink_order_reservation_id_641704bb_fk_hms_reservation_id` (`reservation_id`),
+  ADD KEY `hms_drink_order_completed_by_id_034048ab_fk_hms_staff_id` (`completed_by_id`),
+  ADD KEY `hms_drink_order_registered_by_id_925d406a_fk_hms_staff_id` (`registered_by_id`);
 
 --
 -- Indexes for table `hms_food`
@@ -716,8 +734,9 @@ ALTER TABLE `hms_food`
 ALTER TABLE `hms_food_order`
   ADD PRIMARY KEY (`id`),
   ADD KEY `hms_food_order_food_id_f4f33934_fk_hms_food_id` (`food_id`),
-  ADD KEY `hms_food_order_registered_by_id_7ec240c7_fk_hms_staff_id` (`registered_by_id`),
-  ADD KEY `hms_food_order_reservation_id_1abcddc8_fk_hms_reservation_id` (`reservation_id`);
+  ADD KEY `hms_food_order_reservation_id_1abcddc8_fk_hms_reservation_id` (`reservation_id`),
+  ADD KEY `hms_food_order_completed_by_id_a1b6dadc_fk_hms_staff_id` (`completed_by_id`),
+  ADD KEY `hms_food_order_registered_by_id_7ec240c7_fk_hms_staff_id` (`registered_by_id`);
 
 --
 -- Indexes for table `hms_permission`
@@ -793,7 +812,7 @@ ALTER TABLE `django_content_type`
 -- AUTO_INCREMENT for table `django_migrations`
 --
 ALTER TABLE `django_migrations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `hms_auth`
@@ -817,7 +836,7 @@ ALTER TABLE `hms_drink`
 -- AUTO_INCREMENT for table `hms_drink_order`
 --
 ALTER TABLE `hms_drink_order`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `hms_food`
@@ -829,7 +848,7 @@ ALTER TABLE `hms_food`
 -- AUTO_INCREMENT for table `hms_food_order`
 --
 ALTER TABLE `hms_food_order`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `hms_permission`
@@ -908,6 +927,7 @@ ALTER TABLE `hms_booking_record`
 -- Constraints for table `hms_drink_order`
 --
 ALTER TABLE `hms_drink_order`
+  ADD CONSTRAINT `hms_drink_order_completed_by_id_034048ab_fk_hms_staff_id` FOREIGN KEY (`completed_by_id`) REFERENCES `hms_staff` (`id`),
   ADD CONSTRAINT `hms_drink_order_drink_id_a75367a7_fk_hms_drink_id` FOREIGN KEY (`drink_id`) REFERENCES `hms_drink` (`id`),
   ADD CONSTRAINT `hms_drink_order_registered_by_id_925d406a_fk_hms_staff_id` FOREIGN KEY (`registered_by_id`) REFERENCES `hms_staff` (`id`),
   ADD CONSTRAINT `hms_drink_order_reservation_id_641704bb_fk_hms_reservation_id` FOREIGN KEY (`reservation_id`) REFERENCES `hms_reservation` (`id`);
@@ -916,6 +936,7 @@ ALTER TABLE `hms_drink_order`
 -- Constraints for table `hms_food_order`
 --
 ALTER TABLE `hms_food_order`
+  ADD CONSTRAINT `hms_food_order_completed_by_id_a1b6dadc_fk_hms_staff_id` FOREIGN KEY (`completed_by_id`) REFERENCES `hms_staff` (`id`),
   ADD CONSTRAINT `hms_food_order_food_id_f4f33934_fk_hms_food_id` FOREIGN KEY (`food_id`) REFERENCES `hms_food` (`id`),
   ADD CONSTRAINT `hms_food_order_registered_by_id_7ec240c7_fk_hms_staff_id` FOREIGN KEY (`registered_by_id`) REFERENCES `hms_staff` (`id`),
   ADD CONSTRAINT `hms_food_order_reservation_id_1abcddc8_fk_hms_reservation_id` FOREIGN KEY (`reservation_id`) REFERENCES `hms_reservation` (`id`);

@@ -9,7 +9,7 @@ class POST(dict):
     """
         POST request object that extends the python's native list object
     """
-    def getlist(self,var:str) ->list:
+    def getlist(self,var:str=None) ->list:
         """
             Get list of array sent from a request
         """
@@ -27,3 +27,4 @@ class POST(dict):
                     var_array.insert(int(match_re.group('index')),{})
                     var_array[int(match_re.group('index'))][match_re.group('option_key')] = self[key]
         return var_array
+    

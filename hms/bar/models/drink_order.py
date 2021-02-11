@@ -29,7 +29,8 @@ class DrinkOrderModel(models.Model):
     drink = models.ForeignKey(DrinkModel, on_delete=models.DO_NOTHING, verbose_name="Drink")
     amount =  models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Amount")
     quantity = models.IntegerField(verbose_name="Quantity")
-    registered_by = models.ForeignKey(StaffModel, on_delete=models.DO_NOTHING, verbose_name="Registered By")
+    registered_by = models.ForeignKey(StaffModel, on_delete=models.DO_NOTHING, null=True, verbose_name="Registered By")
+    completed_by = models.ForeignKey(StaffModel, on_delete=models.DO_NOTHING, null=True, related_name="drink_order_completed_by", verbose_name="Commpleted By")
     status = models.CharField(max_length=15, verbose_name="Status")
     timestamp = models.DateTimeField(auto_now=True, verbose_name='Timestamp')
 
