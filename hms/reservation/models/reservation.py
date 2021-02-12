@@ -47,7 +47,9 @@ class ReservationModel(models.Model):
 
     class Status:
         ACTIVE = "active"
-        CLOSED = "closed"
+        CHECKED_OUT = "checked_out"
+        
+        options = [ACTIVE, CHECKED_OUT]
     
     def generate_ref(self):
         len = 12

@@ -73,7 +73,7 @@ def list_reservation(request, page):
     if data.getlist("status"):
         status_query = data.getlist("status")
     else:
-        status_query =  STATUS_OPTIONS
+        status_query =  ReservationModel.Status.options
 
     # Set amount range
     if data.get("minAmount"):

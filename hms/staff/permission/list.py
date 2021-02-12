@@ -18,6 +18,15 @@ CAN_BOOK_ROOM = 'can_book_room'
 #
 #This permission is required to book room
 CAN_VIEW_BOOKING = 'can_view_booking'
+#
+#This permission is required to make payment
+CAN_MAKE_PAYMENT = 'can_make_payment'
+#
+#This permission is required to print invoice
+CAN_PRINT_INVOICE = 'can_print_invoice'
+#
+#This permission is required to view payment history
+CAN_VIEW_PAYMENT_HISTORY = 'can_view_payment_history'
 
 
 """ MANAGEMENT PERMISSIONS """
@@ -54,6 +63,10 @@ CAN_PLACE_DRINK_ORDER = 'can_place_drink_order'
 #
 #This permission is required to order drink
 CAN_VIEW_DRINK_ORDER = 'can_view_drink_order'
+#
+#This permission is required to reverse payment
+CAN_REVERSE_PAYMENT = 'can_reverse_payment'
+
 
 """ ADMINISTRATIVE PERMISSIONS """
 #
