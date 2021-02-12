@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 12, 2021 at 03:34 AM
+-- Generation Time: Feb 12, 2021 at 02:20 PM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.4
 
@@ -319,7 +319,8 @@ CREATE TABLE `hms_auth` (
 
 INSERT INTO `hms_auth` (`id`, `email`, `password`, `is_staff`, `date_created`, `last_login`, `is_active`) VALUES
 (1, 'opeyemiakosile@gmail.com', 'pbkdf2_sha256$216000$2dWIYNrp8sfC$S6d5NiNdpCOUVXPt4SefUbGge3Frh/boCoDPxMgtxYY=', 1, '2021-02-05 03:05:16.139000', '2021-02-05 03:05:16.139000', 1),
-(3, 'sam@gmail.com', 'pbkdf2_sha256$216000$hZK1fA1bDINi$PolNEKMHApfQ+Ywy8Eiqj6U843NEJ3VSjL4NUf+0ArU=', 1, '2021-02-05 19:23:29.770345', '2021-02-05 19:23:29.770345', 1);
+(3, 'sam@gmail.com', 'pbkdf2_sha256$216000$hZK1fA1bDINi$PolNEKMHApfQ+Ywy8Eiqj6U843NEJ3VSjL4NUf+0ArU=', 1, '2021-02-05 19:23:29.770345', '2021-02-05 19:23:29.770345', 1),
+(4, 'samloco@gmail.com', 'pbkdf2_sha256$216000$SQnl4gsi21VC$8dTQGsN6Ng+fHgnQv+QbfE4ZBCg8S0TSHwi+FHEXaWk=', 1, '2021-02-12 13:02:19.297572', '2021-02-12 13:02:19.297572', 1);
 
 -- --------------------------------------------------------
 
@@ -339,7 +340,8 @@ CREATE TABLE `hms_auth_token` (
 --
 
 INSERT INTO `hms_auth_token` (`key`, `created`, `expires`, `user_id`) VALUES
-('27db1f77461eb8d1fa1e1a32004cf183b0282677', '2021-02-11 21:12:26.240790', '2021-02-12 02:45:21.778685', 1);
+('3a1f30c256bebe7fd142d738ae496ac099307ee1', '2021-02-12 13:12:15.580586', '2021-02-12 13:33:34.453119', 1),
+('77c5bb6eba3842991ebbc256a88d28255c78dfaf', '2021-02-12 13:08:28.669213', '2021-02-12 13:23:31.188880', 4);
 
 -- --------------------------------------------------------
 
@@ -617,7 +619,8 @@ CREATE TABLE `hms_staff` (
 
 INSERT INTO `hms_staff` (`id`, `first_name`, `last_name`, `gender`, `phone_number`, `position`, `avatar`, `auth_id`) VALUES
 (1, 'Opeyemi', 'Akosile', 'male', '08076567677', 'Administrator', '', 1),
-(2, 'Samuel', 'Opeyemi', 'male', '0907383783', 'Account Officer', '', 3);
+(2, 'Samuel', 'Opeyemi', 'male', '0907383783', 'Account Officer', '', 3),
+(3, 'Sammy', 'Samora', 'male', '09092763737', 'Bar Tender', '', 4);
 
 -- --------------------------------------------------------
 
@@ -869,7 +872,7 @@ ALTER TABLE `django_migrations`
 -- AUTO_INCREMENT for table `hms_auth`
 --
 ALTER TABLE `hms_auth`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `hms_booking_record`
@@ -929,7 +932,7 @@ ALTER TABLE `hms_room`
 -- AUTO_INCREMENT for table `hms_staff`
 --
 ALTER TABLE `hms_staff`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `hms_staff_permission`

@@ -26,9 +26,10 @@ from django.utils import timezone, datetime_safe
 from kitchen.models import FoodModel, FoodOrderModel
 from kitchen.serializers import FoodSerializer, FoodOrderSerializer
 from bar.models import DrinkOrderModel
+from bar.serializers import DrinkOrderSerializer
 from kitchen.serializers import FoodOrderSerializer
 from room.models import BookingRecordModel
-from room.serializers import RoomSerializer
+from room.serializers import RoomSerializer, BookingRecordSerializer
 from decimal import Decimal
 
 """
@@ -39,10 +40,10 @@ from decimal import Decimal
 def get_invoice(request, reference): 
     try:
         reservation = ReservationModel.manage.get(reference=reference)
-
+        print("i am here")
         food_orders = FoodOrderModel.manage.filter(reservation=reservation)
         drink_orders = DrinkOrderModel.manage.filter(reservation=reservation)
-        room_bookings = RoomModel.manage.filter(reservation=reservation)
+        room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
 
         #Get invoice amounts
         food = food_orders.aggregate(total_food=Sum("amount"))
@@ -51,8 +52,17 @@ def get_invoice(request, reference):
 
         res_serializer = ReservationSerializer(reservation)
         food_serializer = FoodOrderSerializer(food_orders, many=True)
-        drink_serializer = FoodOrderSerializer(drink_orders, many=True)
-        room_serializer = FoodOrderSerializer(room_bookings, many=True)
+        drink_serializer = DrinkOrderSerializer(drink_orders, many=True)
+        room_serializer = BookingRecordSerializer(room_bookings, many=True)
+
+        #Get the last payment made
+        history = PaymentModel.manage.filter(reservation=reservation, status=PaymentModel.Status.COMPLETED).order_by("-id")
+        if len(history) > 0:
+            amount_paid = history[0].amount_paid
+            amount_unpaid = history[0].amount_unpaid
+        else:
+            amount_paid = 0
+            amount_unpaid = reservation.amount_spent
 
         return Response(response_maker(response_type='success',message='Reservation Invoice',
             data={
@@ -60,9 +70,11 @@ def get_invoice(request, reference):
                 "food": food_serializer.data,
                 "drink": drink_serializer.data,
                 "room": room_serializer.data,
-                "total_food":food.total_food,
-                "total_drink":drink.total_drink,
-                "total_room":room.total_room,
+                "total_food":food['total_food'],
+                "total_drink":drink['total_drink'],
+                "total_room":room['total_room'],
+                "amount_paid":amount_paid,
+                "amount_unpaid":amount_unpaid,
             }),status=HTTP_200_OK)
     except StaffModel.DoesNotExist:
         return Response(response_maker(response_type='error',message='Reservation deos not exist'),status=HTTP_400_BAD_REQUEST)
@@ -220,3 +232,50 @@ def list_payment(request, page):
     res_serializer = PaymentSerializer(reservation_list, many=True)
     return Response(response_maker(response_type='success',message='All Payment',
         count=total_reservation,data=res_serializer.data),status=HTTP_200_OK)
+
+
+"""
+    get payment reports
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+def get_payment_report(request): 
+    #Copy dict data
+    data = dict(request._POST)
+    if data.get("status") == 'all':
+        status = PaymentModel.Status.options
+    else:
+        status = [data.get("status")]
+
+    # Set timestamp range 
+    if data.get("start_date"):
+        start_date = data.get("start_date").split("T")[0]
+    else:
+        start_date = datetime_safe.datetime(year=1999, month=1, day=1) #datetime(year=1999, month=1, day=1) 
+
+    if data.get("end_date"):  
+        end_date = datetime.strptime("{} 23:59:59".format(data.get("end_date").split("T")[0]),"%Y-%m-%d %H:%M:%S")
+    else:
+        end_date = timezone.now()
+    
+    try:
+        orders = PaymentModel.manage.filter(
+            Q(timestamp__range=(start_date,end_date)) &
+            Q(status__in=status)
+        )
+        if data.get("display") != "all":
+            orders = orders.filter(
+                Q(posted_by=StaffModel.objects.get(auth=request.user))
+            )
+        #Get total count & total_amount
+        count = orders.count()
+        total_amount = orders.aggregate(total_amount=Sum("amount"))["total_amount"]
+        order_serializer = PaymentSerializer(orders, many=True)
+        return Response(response_maker(response_type='success',message='All Payments',
+            data={
+                "count": count,
+                "total_amount": total_amount,
+                "data": order_serializer.data,
+            }),status=HTTP_200_OK)
+    except Exception as e:
+        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)

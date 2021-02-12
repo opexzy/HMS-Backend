@@ -66,6 +66,9 @@ CAN_VIEW_DRINK_ORDER = 'can_view_drink_order'
 #
 #This permission is required to reverse payment
 CAN_REVERSE_PAYMENT = 'can_reverse_payment'
+#
+#This permission is required to generate kitchen report
+CAN_VIEW_KITCHEN_REPORT = 'can_view_kitchen_report'
 
 
 """ ADMINISTRATIVE PERMISSIONS """

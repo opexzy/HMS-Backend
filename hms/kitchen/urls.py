@@ -1,6 +1,4 @@
 from django.conf.urls import url
-
-from bar.views.drink_manager import get_all_drinks
 from .views.food_manager import *
 
 urlpatterns = [
@@ -13,4 +11,5 @@ urlpatterns = [
     url(r'^food/order/list$',list_order, {'page':1}, name="order_list"),
     url(r'^food/order/list/(?P<page>[0-9]+)$', order_food,  name="order_list_page"),
     url(r'^food/order/update$', update_order, name="update_order"),
+    url(r'^food/order/report$',get_order_report, name="order_report"),
 ]

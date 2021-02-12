@@ -1,3 +1,4 @@
+from django.db.models.aggregates import Sum
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -305,5 +306,54 @@ def update_order(request):
             #Add Food Order
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+
+
+
+"""
+    get food order reports
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+def get_order_report(request): 
+    #Copy dict data
+    data = dict(request._POST)
+    if data.get("status") == 'all':
+        status = DrinkOrderModel.Status.options
+    else:
+        status = [data.get("status")]
+
+    # Set timestamp range 
+    if data.get("start_date"):
+        start_date = data.get("start_date").split("T")[0]
+    else:
+        start_date = datetime_safe.datetime(year=1999, month=1, day=1) #datetime(year=1999, month=1, day=1) 
+
+    if data.get("end_date"):  
+        end_date = datetime.strptime("{} 23:59:59".format(data.get("end_date").split("T")[0]),"%Y-%m-%d %H:%M:%S")
+    else:
+        end_date = timezone.now()
+    
+    try:
+        orders = DrinkOrderModel.manage.filter(
+            Q(timestamp__range=(start_date,end_date)) &
+            Q(status__in=status)
+        )
+        if data.get("display") != "all":
+            orders = orders.filter(
+                Q(registered_by=StaffModel.objects.get(auth=request.user)) |
+                Q(completed_by=StaffModel.objects.get(auth=request.user))
+            )
+        #Get total count & total_amount
+        count = orders.count()
+        total_amount = orders.aggregate(total_amount=Sum("amount"))["total_amount"]
+        order_serializer = DrinkOrderSerializer(orders, many=True)
+        return Response(response_maker(response_type='success',message='All Drink Orders',
+            data={
+                "count": count,
+                "total_amount": total_amount,
+                "data": order_serializer.data,
+            }),status=HTTP_200_OK)
     except Exception as e:
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)

@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^drink/order/list$',list_order, {'page':1}, name="order_list"),
     url(r'^drink/order/list/(?P<page>[0-9]+)$', order_drink,  name="order_list_page"),
     url(r'^drink/order/update$', update_order, name="update_order"),
+    url(r'^drink/order/report$', get_order_report, name="order_report"),
 ]

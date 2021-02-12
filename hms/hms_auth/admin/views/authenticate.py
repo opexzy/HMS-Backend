@@ -38,7 +38,7 @@ def login(request):
                 AuthTokenModel.objects.select_related('user').get(user=user).delete()
             except AuthTokenModel.DoesNotExist:
                 pass
-            staff = StaffModel.objects.get(pk=user.pk)
+            staff = StaffModel.objects.get(auth=user)
             serializer = StaffSerializer(staff)
             token, _ = AuthTokenModel.objects.get_or_create(user=user)
             return Response({'token': token.key, 'user':serializer.data, 'message':'Login successful!'},status=HTTP_200_OK)
