@@ -22,6 +22,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             'amount_paid', 
             'amount_unpaid', 
             'status',
+            'narration',
             'timestamp'
         ]
 
