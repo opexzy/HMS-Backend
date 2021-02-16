@@ -139,7 +139,7 @@ def book_room(request):
     #Add new Room to database
     try:
         with transaction.atomic():
-            reservation = ReservationModel.manage.get(reference=data.get('reference'))
+            reservation = ReservationModel.manage.get(reference=data.get('reference'), status=ReservationModel.Status.ACTIVE)
             room = RoomModel.manage.get(id=data.get('id'))
 
             if room.available < int(data.get('quantity')):
@@ -164,6 +164,8 @@ def book_room(request):
         return Response(response_maker(response_type='success',message="Room Booked successfully"),status=HTTP_200_OK)
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+    except ReservationModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message="Reservation is not active or does not exist"),status=HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
 
@@ -222,7 +224,7 @@ def list_booking(request, page):
                 Q(reservation__first_name__icontains=data.get("keyword",None)) |
                 Q(reservation__last_name__icontains=data.get("keyword",None)) |
                 Q(reservation__phone_number=data.get("keyword",None)) |
-                Q(room__name=data.get("keyword",None))
+                Q(room__name__icontains=data.get("keyword",None))
             ) 
             &
             (
@@ -245,3 +247,12 @@ def list_booking(request, page):
     return Response(response_maker(response_type='success',message='All Rooms',
         count=total_reservation,data=res_serializer.data),status=HTTP_200_OK)
 
+
+"""
+    List All Rooms
+"""
+@api_view(['GET']) #Only accept get request
+def all_rooms(request):
+    rooms = RoomModel.manage.all()
+    room_serializer = RoomSerializer(rooms, many=True)
+    return Response(response_maker(response_type='success',message='All Rooms',data=room_serializer.data),status=HTTP_200_OK)

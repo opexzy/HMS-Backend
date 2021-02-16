@@ -26,6 +26,7 @@ class FoodOrderSerializer(serializers.ModelSerializer):
             'quantity', 
             'placed_by',
             'finalized_by',
+            'payment',
             'status',
             'timestamp'
         ]

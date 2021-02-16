@@ -40,7 +40,6 @@ from decimal import Decimal
 def get_invoice(request, reference): 
     try:
         reservation = ReservationModel.manage.get(reference=reference)
-        print("i am here")
         food_orders = FoodOrderModel.manage.filter(reservation=reservation)
         drink_orders = DrinkOrderModel.manage.filter(reservation=reservation)
         room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
@@ -136,6 +135,12 @@ def make_payment(request):
                 reservation.credit_balance = reservation.credit_balance + excess_amount
             if payment.amount_unpaid <= 0:
                 reservation.status = ReservationModel.Status.CHECKED_OUT
+                #Relase every room booked on this reservation
+                room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
+                for booking in room_bookings:
+                    room = RoomModel.manage.get(pk=booking.room.pk)
+                    room.available = room.available + int(booking.quantity)
+                    room.save()
             reservation.save()
         res_serializer = ReservationSerializer(reservation)
         return Response(response_maker(response_type='success',message="Payment made successfully",data=res_serializer.data),status=HTTP_200_OK)

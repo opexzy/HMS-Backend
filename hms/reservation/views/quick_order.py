@@ -38,7 +38,7 @@ def quick_order(request, reference):
     #Add new Room to database
     try:
         with transaction.atomic():
-            reservation = ReservationModel.manage.get(reference=reference)
+            reservation = ReservationModel.manage.get(reference=reference, status=ReservationModel.Status.ACTIVE)
             staff = StaffModel.objects.get(auth=request.user)
             #Register order as pending in database
             for order in data:
@@ -77,6 +77,8 @@ def quick_order(request, reference):
             return Response(response_maker(response_type='success',message="Order Placed successfully"),status=HTTP_200_OK)
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+    except ReservationModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message="Reservation is not active or does not exist"),status=HTTP_400_BAD_REQUEST)
     except QuantityOutOfRange:
         return Response(response_maker(response_type='error',message="Quantity out of available item range"),status=HTTP_400_BAD_REQUEST)
     except Exception as e:

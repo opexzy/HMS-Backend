@@ -5,7 +5,8 @@ from django.db import models
 from .room import RoomModel
 from reservation.models import ReservationModel
 from decimal import Decimal
-from utils.randstr import get_token
+from staff.models import StaffModel
+from reservation.models import PaymentModel
 
 
 STATUS_OPTIONS = ["active","closed"]
@@ -32,6 +33,8 @@ class BookingRecordModel(models.Model):
     check_in = models.DateField(verbose_name="Checkin Date")
     check_out = models.DateField(verbose_name="Checkout Date")
     status = models.CharField(max_length=15, verbose_name="Status")
+    booked_by = models.ForeignKey(StaffModel, on_delete=models.DO_NOTHING, verbose_name="Booked By", null=True)
+    payment = models.ForeignKey(PaymentModel, null=True, on_delete=models.DO_NOTHING, verbose_name="Payment Id")
     timestamp = models.DateTimeField(auto_now=True, verbose_name='Timestamp')
 
     manage = BookingRecordModelManager()
@@ -41,10 +44,6 @@ class BookingRecordModel(models.Model):
         CLOSED = "closed"
         OVERDUE = "overdue"
         options = [ACTIVE, CLOSED, OVERDUE]
-    
-    def generate_ref(self):
-        len = 12
-        return  get_token(len).upper()
 
 
     class Meta:

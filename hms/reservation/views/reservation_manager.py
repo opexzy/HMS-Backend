@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from staff.models import staff
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
-from staff.permission import use_permission, CAN_MAKE_RESERVATION, CAN_VIEW_RESERVATION
+from staff.permission import use_permission, CAN_MAKE_RESERVATION, CAN_VIEW_RESERVATION, CAN_CANCEL_RESERVATION
 from hms_auth.models import AuthModel
 from staff.models import StaffModel
 from django.db import transaction
@@ -21,6 +21,10 @@ from reservation.models import ReservationModel
 from reservation.models.reservation import STATUS_OPTIONS
 from datetime import datetime, timedelta
 from django.utils import timezone, datetime_safe
+from room.models import RoomModel, BookingRecordModel
+from room.serializers import RoomSerializer, BookingRecordSerializer
+from decimal import Decimal
+
 
 """
     Make New Reservation
@@ -33,17 +37,43 @@ def make_reservation(request):
     data = dict(request._POST)
     #Add new Reservation to database
     try:
-        reservation = ReservationModel(
-            first_name=data.get('first_name'),
-            last_name=data.get('last_name'),
-            gender=data.get('gender'),
-            phone_number=data.get('phone_number'),
-            created_by=StaffModel.objects.get(auth=request.user),
-            status=ReservationModel.Status.ACTIVE,
-            credit_balance=data.get('credit_balance'),
-        )
-        reservation.save()
-        res_serializer = ReservationSerializer(reservation)
+        with transaction.atomic():
+            reservation = ReservationModel(
+                reservation_type=data.get("reservation_type"),
+                corporate_name=data.get("corporate_name"),
+                first_name=data.get('first_name'),
+                last_name=data.get('last_name'),
+                gender=data.get('gender'),
+                phone_number=data.get('phone_number'),
+                created_by=StaffModel.objects.get(auth=request.user),
+                status=ReservationModel.Status.ACTIVE,
+                credit_balance=data.get('credit_balance'),
+            )
+            reservation.save()
+            if data.get("book_room") == "true":
+                room = RoomModel.manage.get(id=data.get('room'))
+
+                if room.available < int(data.get('quantity')):
+                    return Response(response_maker(response_type='error',message='Avaialble Rooms Less Than Quantity'),status=HTTP_400_BAD_REQUEST)
+                #Add room booking
+                booking = BookingRecordModel(
+                    reservation=reservation,
+                    room=room,
+                    amount=Decimal(float(data.get('quantity'))) * Decimal(float(data.get('days'))) * room.price,
+                    quantity=data.get('quantity'),
+                    check_in=datetime.now().date(),
+                    check_out=datetime.now().date() + timedelta(days=int(data.get("days"))),
+                    status=ReservationModel.Status.ACTIVE
+                )
+                booking.save()
+                #Add cost to reservation amount spent
+                reservation.amount_spent = reservation.amount_spent + Decimal(float(booking.amount))
+                reservation.save()
+                #Update available room
+                room.available = room.available - int(booking.quantity)
+                room.save()
+
+            res_serializer = ReservationSerializer(reservation)
         return Response(response_maker(response_type='success',message="Reservation made successfully",data=res_serializer.data),status=HTTP_200_OK)
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
@@ -167,10 +197,56 @@ def list_reservation(request, page):
 def get_reservation(request, reference): 
 
     try:
-        reservation = ReservationModel.manage.get(reference=reference)
+        reservation = ReservationModel.manage.get(reference=reference, status=ReservationModel.Status.ACTIVE)
         res_serializer = ReservationSerializer(reservation)
         return Response(response_maker(response_type='success',message='Customer Reservations',
             data=res_serializer.data),status=HTTP_200_OK)
+    except ReservationModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message='Reservation deos not exist or not active'),status=HTTP_400_BAD_REQUEST)
     except Exception:
-        return Response(response_maker(response_type='error',message='Reservation deos not exist'),status=HTTP_400_BAD_REQUEST)
+        return Response(response_maker(response_type='error',message='Unknown internal error'),status=HTTP_400_BAD_REQUEST)
 
+"""
+    cancel Reservation
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept post request
+@use_permission(CAN_CANCEL_RESERVATION)
+def cancel_reservation(request, reference): 
+
+    try:
+        with transaction.atomic():
+            reservation = ReservationModel.manage.get(reference=reference, status=ReservationModel.Status.ACTIVE)
+            if reservation.amount_unpaid <= 0:
+                reservation.status=ReservationModel.Status.CANCELED
+                reservation.save()
+                #Relase every room booked on this reservation
+                room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
+                for booking in room_bookings:
+                    room = RoomModel.manage.get(pk=booking.room.pk)
+                    room.available = room.available + int(booking.quantity)
+                    room.save()
+        return Response(response_maker(response_type='success',message='Customer Reservation Canceled Successfully'),status=HTTP_200_OK)
+    except ReservationModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message='Reservation deos not exist or not active'),status=HTTP_400_BAD_REQUEST)
+    except Exception:
+        return Response(response_maker(response_type='error',message='Unknown internal error'),status=HTTP_400_BAD_REQUEST)
+
+
+
+"""
+    get all active reservation
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept post request
+def list_active_reservation(request): 
+
+    try:
+        reservation = ReservationModel.manage.filter(status=ReservationModel.Status.ACTIVE)
+        res_serializer = ReservationSerializer(reservation, many=True)
+        return Response(response_maker(response_type='success',message='Customer Reservations',
+            data=res_serializer.data),status=HTTP_200_OK)
+    except ReservationModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message='Reservation deos not exist or not active'),status=HTTP_400_BAD_REQUEST)
+    except Exception:
+        return Response(response_maker(response_type='error',message='Unknown internal error'),status=HTTP_400_BAD_REQUEST)

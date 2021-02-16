@@ -13,7 +13,9 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = ReservationModel
         fields = [
             'id', 
-            'reference', 
+            'reference',
+            'reservation_type',
+            'corporate_name',
             'first_name', 
             'last_name',
             'gender', 
@@ -22,6 +24,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             'status',
             'credit_balance',
             'amount_spent',
+            'amount_unpaid',
             'timestamp'
         ]
 

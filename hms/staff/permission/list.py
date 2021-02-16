@@ -34,6 +34,9 @@ CAN_VIEW_PAYMENT_HISTORY = 'can_view_payment_history'
 #This permission is required to edit customer
 CAN_EDIT_CUSTOMER = 'can_edit_customer'
 #
+#This permission is required to generate kitchen report
+CAN_CANCEL_RESERVATION = 'can_cancel_reservation'
+#
 #This permission is required to add food
 CAN_ADD_FOOD = 'can_add_food'
 #

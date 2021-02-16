@@ -55,3 +55,21 @@ def validate_token(request):
         'user':serializer.data, 
         'permissions':get_staff_permission(staff), 
     }, status=HTTP_200_OK)
+
+"""Update Password"""
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,)) #Allow only authenticated  request
+def update_password(request):
+    data = request.POST
+    password = data.get('password', False)
+    password_verify = data.get('password_verify', False)
+    try:
+        if (len(password) >= 6) and (password == password_verify):
+            request.user.set_password(password)
+            request.user.save()
+            return Response({'message': 'Password Changed Successfully'},status=HTTP_200_OK)
+        else:
+            return Response({'message': 'Password must be six characters or more and must match'},status=HTTP_400_BAD_REQUEST)
+    except Exception:
+         return Response({'message': 'An unknown internal Error occured'},status=HTTP_400_BAD_REQUEST)
+

@@ -31,6 +31,7 @@ class PaymentModel(models.Model):
     amount_paid = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Amount Paid")
     amount_unpaid = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Amount Unpaid")
     status = models.CharField(max_length=15, verbose_name="Payment Status")
+    narration = models.CharField(max_length=255, verbose_name="Narration")
     timestamp = models.DateTimeField(auto_now=True, verbose_name="Timestamp")
 
     manage = PaymentModelManager()

@@ -138,7 +138,7 @@ def order_drink(request):
     #Add new Room to database
     try:
         with transaction.atomic():
-            reservation = ReservationModel.manage.get(reference=data.get('reference'))
+            reservation = ReservationModel.manage.get(reference=data.get('reference'), status=ReservationModel.Status.ACTIVE)
             drink = DrinkModel.manage.get(id=data.get('id'))
 
             if drink.available < int(data.get('quantity')):
@@ -172,6 +172,8 @@ def order_drink(request):
         return Response(response_maker(response_type='success',message="Drink Order Placed successfully"),status=HTTP_200_OK)
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+    except ReservationModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message="Reservation is not active or does not exist"),status=HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
 
