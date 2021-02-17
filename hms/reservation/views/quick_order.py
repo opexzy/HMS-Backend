@@ -1,4 +1,5 @@
 from re import error
+from django.db.models.query import InstanceCheckMeta
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -25,6 +26,7 @@ from room.models import BookingRecordModel, RoomModel
 from kitchen.serializers import FoodSerializer, FoodOrderSerializer
 from decimal import Decimal
 from reservation.exception import QuantityOutOfRange
+from reservation.models import PaymentModel
 
 """
     Make Quick Order
@@ -40,6 +42,48 @@ def quick_order(request, reference):
         with transaction.atomic():
             reservation = ReservationModel.manage.get(reference=reference, status=ReservationModel.Status.ACTIVE)
             staff = StaffModel.objects.get(auth=request.user)
+            #Check payment method
+            payment_status = False
+            channel = ""
+            narration = "Not Available"
+            if request._POST.get("payment_method") == "credit_balance":
+                #Check if credit balance is enough to pay
+                if reservation.credit_balance >= Decimal(float(request._POST.get("total_amount"))):
+                    reservation.credit_balance = reservation.credit_balance - Decimal(float(request._POST.get("total_amount")))
+                    reservation.amount_spent = reservation.amount_spent + Decimal(float(request._POST.get("total_amount")))
+                    payment_status = True
+                    channel = "direct",
+                    narration = "Payment made from available credit balance"
+                else:
+                    return Response(response_maker(response_type='error',message='Insufficient Credit Balance'),status=HTTP_400_BAD_REQUEST)
+            elif request._POST.get("payment_method") == "instant_pay":
+                reservation.amount_spent = reservation.amount_spent + Decimal(float(request._POST.get("total_amount")))
+                payment_status = True
+                channel = request._POST.get("channel")
+                if request._POST.get("channel") == "cash":
+                    narration = "Cash collected by: {} {}".format(staff.first_name, staff.last_name)
+                elif request._POST.get("channel") == "pos":
+                    narration = "Payment made with POS using debit/credit card"
+                elif request._POST.get("channel") == "transfer":
+                    narration = "Customer made bank transfer with reference id/NO: {}".format(request._POST.get("narration"))
+            else:
+                reservation.amount_spent = reservation.amount_spent + Decimal(float(request._POST.get("total_amount")))
+                reservation.amount_unpaid = reservation.amount_unpaid + Decimal(float(request._POST.get("total_amount")))
+                payment_status = False
+            reservation.save()
+            #Add payment to payment history
+            if payment_status:
+                payment = PaymentModel(
+                    reservation=reservation,
+                    posted_by=staff,
+                    channel=channel,
+                    amount=float(request._POST.get("total_amount")),
+                    status=PaymentModel.Status.COMPLETED,
+                    narration=narration    
+                )
+                payment.save()
+            else:
+                payment = None        
             #Register order as pending in database
             for order in data:
                 if order.get("type") == "foods":
@@ -50,6 +94,7 @@ def quick_order(request, reference):
                         amount=order.get("price"),
                         quantity=order.get("quantity"),
                         registered_by=staff,
+                        payment=payment,
                         status=FoodOrderModel.Status.PENDING
                     ).save()
                     #Deduct qauntity from food model
@@ -65,6 +110,7 @@ def quick_order(request, reference):
                         amount=order.get("price"),
                         quantity=order.get("quantity"),
                         registered_by=staff,
+                        payment=payment,
                         status=DrinkOrderModel.Status.PENDING
                     ).save()
                     #Deduct qauntity from food model
@@ -72,8 +118,6 @@ def quick_order(request, reference):
                         raise QuantityOutOfRange
                     drink.available = int(drink.available) - int(order.get("quantity"))
                     drink.save()
-            reservation.amount_spent = reservation.amount_spent + Decimal(float(request._POST.get("total_amount")))
-            reservation.save()
             return Response(response_maker(response_type='success',message="Order Placed successfully"),status=HTTP_200_OK)
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)

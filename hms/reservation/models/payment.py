@@ -28,8 +28,6 @@ class PaymentModel(models.Model):
     posted_by = models.ForeignKey(StaffModel, on_delete=models.DO_NOTHING, null=True, verbose_name="Registered By")
     channel = models.CharField(max_length=25, verbose_name="Payment Channel")
     amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Amount")
-    amount_paid = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Amount Paid")
-    amount_unpaid = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Amount Unpaid")
     status = models.CharField(max_length=15, verbose_name="Payment Status")
     narration = models.CharField(max_length=255, verbose_name="Narration")
     timestamp = models.DateTimeField(auto_now=True, verbose_name="Timestamp")

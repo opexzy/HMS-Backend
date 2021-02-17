@@ -38,6 +38,7 @@ def make_reservation(request):
     #Add new Reservation to database
     try:
         with transaction.atomic():
+            staff = StaffModel.objects.get(auth=request.user)
             reservation = ReservationModel(
                 reservation_type=data.get("reservation_type"),
                 corporate_name=data.get("corporate_name"),
@@ -63,11 +64,13 @@ def make_reservation(request):
                     quantity=data.get('quantity'),
                     check_in=datetime.now().date(),
                     check_out=datetime.now().date() + timedelta(days=int(data.get("days"))),
+                    booked_by=staff,
                     status=ReservationModel.Status.ACTIVE
                 )
                 booking.save()
                 #Add cost to reservation amount spent
                 reservation.amount_spent = reservation.amount_spent + Decimal(float(booking.amount))
+                reservation.amount_unpaid = reservation.amount_unpaid + Decimal(float(booking.amount))
                 reservation.save()
                 #Update available room
                 room.available = room.available - int(booking.quantity)

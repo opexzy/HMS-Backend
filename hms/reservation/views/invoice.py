@@ -54,15 +54,6 @@ def get_invoice(request, reference):
         drink_serializer = DrinkOrderSerializer(drink_orders, many=True)
         room_serializer = BookingRecordSerializer(room_bookings, many=True)
 
-        #Get the last payment made
-        history = PaymentModel.manage.filter(reservation=reservation, status=PaymentModel.Status.COMPLETED).order_by("-id")
-        if len(history) > 0:
-            amount_paid = history[0].amount_paid
-            amount_unpaid = history[0].amount_unpaid
-        else:
-            amount_paid = 0
-            amount_unpaid = reservation.amount_spent
-
         return Response(response_maker(response_type='success',message='Reservation Invoice',
             data={
                 "customer": res_serializer.data,
@@ -72,8 +63,8 @@ def get_invoice(request, reference):
                 "total_food":food['total_food'],
                 "total_drink":drink['total_drink'],
                 "total_room":room['total_room'],
-                "amount_paid":amount_paid,
-                "amount_unpaid":amount_unpaid,
+                "amount_paid": reservation.amount_spent - reservation.amount_unpaid,
+                "amount_unpaid":reservation.amount_unpaid,
             }),status=HTTP_200_OK)
     except StaffModel.DoesNotExist:
         return Response(response_maker(response_type='error',message='Reservation deos not exist'),status=HTTP_400_BAD_REQUEST)
@@ -96,44 +87,38 @@ def make_payment(request):
         if float(data.get('amount')) <= 0:
             return Response(response_maker(response_type='success',message="Amount can not be less than or equal zero"),status=HTTP_400_BAD_REQUEST)
         staff = StaffModel.objects.get(auth=request.user)
-        with transaction.atomic():
-            history = PaymentModel.manage.filter(reservation=reservation, status=PaymentModel.Status.COMPLETED).order_by("-id")
-            if len(history) > 0:
-                amount_paid = history[0].amount_paid
-                amount_unpaid = history[0].amount_unpaid
-                if history[0].amount_unpaid >= Decimal(float(data.get('amount'))):
-                    amount = Decimal(float(data.get('amount')))
-                    excess_amount = 0  
-                else:
-                    amount = history[0].amount_unpaid
-                    excess_amount = Decimal(float(data.get('amount'))) - history[0].amount_unpaid
-            else:
-                amount_paid = 0
-                amount_unpaid = reservation.amount_spent
-                if reservation.amount_spent >= Decimal(float(data.get('amount'))):
-                    amount = Decimal(float(data.get('amount')))
-                    excess_amount = 0  
-                else:
-                    amount = reservation.amount_spent
-                    excess_amount = Decimal(float(data.get('amount'))) - reservation.amount_spent
-
+        channel = data.get("channel")
+        narration = "Not Available"
+        if data.get("channel") == "cash":
+            narration = "Cash collected by: {} {}".format(staff.first_name, staff.last_name)
+        elif data.get("channel") == "pos":
+            narration = "Payment made with POS using debit/credit card"
+        elif data.get("channel") == "direct":
+            narration = "Payment made from available credit balance"
+        elif data.get("channel") == "transfer":
+            narration = "Customer made bank transfer with reference id/NO: {}".format(data.get("narration"))
+        with transaction.atomic(): 
             payment = PaymentModel(
                 reservation=reservation,
                 posted_by=staff,
                 channel=data.get('channel'),
-                amount=amount,
-                amount_paid=amount_paid + amount,
-                amount_unpaid=amount_unpaid - amount,
-                status=PaymentModel.Status.COMPLETED,
-                
+                amount=float(data.get('amount')),
+                status=PaymentModel.Status.COMPLETED,  
+                narration=narration 
             )
             payment.save()
-        
+
+            if reservation.amount_unpaid < Decimal(float(data.get('amount'))):
+                excess_amount = Decimal(float(data.get('amount'))) - reservation.amount_unpaid
+                reservation.amount_unpaid = 0
+            else:
+                excess_amount = 0
+                reservation.amount_unpaid = reservation.amount_unpaid - Decimal(float(data.get('amount')))
             if payment.channel == PaymentModel.Channel.DIRECT:
                 reservation.credit_balance = 0 + excess_amount
             else:
                 reservation.credit_balance = reservation.credit_balance + excess_amount
-            if payment.amount_unpaid <= 0:
+            if reservation.amount_unpaid <= 0:
                 reservation.status = ReservationModel.Status.CHECKED_OUT
                 #Relase every room booked on this reservation
                 room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
@@ -262,7 +247,12 @@ def get_payment_report(request):
         end_date = datetime.strptime("{} 23:59:59".format(data.get("end_date").split("T")[0]),"%Y-%m-%d %H:%M:%S")
     else:
         end_date = timezone.now()
-    
+    reversed_payments = orders = PaymentModel.manage.filter(
+        Q(timestamp__range=(start_date,end_date)) &
+        Q(status=PaymentModel.Status.REVERSED)
+    )
+    total_reversed = reversed_payments.aggregate(total_amount=Sum("amount"))["total_amount"]
+
     try:
         orders = PaymentModel.manage.filter(
             Q(timestamp__range=(start_date,end_date)) &
@@ -280,6 +270,7 @@ def get_payment_report(request):
             data={
                 "count": count,
                 "total_amount": total_amount,
+                "total_reversed": total_reversed,
                 "data": order_serializer.data,
             }),status=HTTP_200_OK)
     except Exception as e:

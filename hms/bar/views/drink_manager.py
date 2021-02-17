@@ -11,7 +11,16 @@ from rest_framework.response import Response
 from staff.models.staff import StaffModel
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
-from staff.permission import use_permission, CAN_ADD_DRINK, CAN_VIEW_DRINK, CAN_EDIT_DRINK, CAN_PLACE_DRINK_ORDER, CAN_VIEW_DRINK_ORDER
+from staff.permission import (
+    use_permission, 
+    has_permission, 
+    CAN_ADD_DRINK, 
+    CAN_VIEW_DRINK, 
+    CAN_EDIT_DRINK, 
+    CAN_PLACE_DRINK_ORDER, 
+    CAN_VIEW_DRINK_ORDER,
+    CAN_CANCEL_ORDER
+    )
 from django.db import transaction
 from hms.settings import ROWS_PER_PAGE
 from django.db.models import Q, F
@@ -22,6 +31,7 @@ from django.utils import timezone, datetime_safe
 from bar.models import DrinkModel, DrinkOrderModel
 from bar.serializers import DrinkSerializer, DrinkOrderSerializer
 from decimal import Decimal
+from reservation.models import PaymentModel
 
 """
     Add New Room
@@ -165,6 +175,7 @@ def order_drink(request):
             order.save()
             #Add cost to reservation amount spent
             reservation.amount_spent = reservation.amount_spent + Decimal(float(order.amount))
+            reservation.amount_unpaid = reservation.amount_unpaid + Decimal(float(order.amount))
             reservation.save()
             #Update available room
             drink.available = drink.available - int(order.quantity)
@@ -228,6 +239,7 @@ def list_order(request, page):
     if data.get("keyword",None):
         reservation_filter = DrinkOrderModel.manage.filter(
             (
+                Q(id=data.get("keyword",None)) |
                 Q(reservation__reference=data.get("keyword",None)) |
                 Q(reservation__first_name__icontains=data.get("keyword",None)) |
                 Q(reservation__last_name__icontains=data.get("keyword",None)) |
@@ -291,15 +303,33 @@ def update_order(request):
                     drink_order.completed_by = staff
                     drink_order.save()
                 elif data.get("status") == DrinkOrderModel.Status.CANCELED:
-                    drink_order.status = DrinkOrderModel.Status.CANCELED
-                    drink_order.completed_by = staff
-                    drink_order.save()
-                    #Upadte available food in the food model
-                    drink_order.drink.available = drink_order.drink.available + drink_order.quantity
-                    drink_order.drink.save()
-                    #Update amount spent
-                    drink_order.reservation.amount_spent = drink_order.reservation.amount_spent - drink_order.amount
-                    drink_order.reservation.save()
+                    if has_permission(request.user,CAN_CANCEL_ORDER):
+                        drink_order.status = DrinkOrderModel.Status.CANCELED
+                        drink_order.completed_by = staff
+                        drink_order.save()
+                        #Upadte available food in the food model
+                        drink_order.drink.available = drink_order.drink.available + drink_order.quantity
+                        drink_order.drink.save()
+                        #Update amount spent
+                        drink_order.reservation.amount_spent = drink_order.reservation.amount_spent - drink_order.amount
+                        if drink_order.payment:
+                            #Return amount back to credit balance
+                            drink_order.reservation.credit_balance = drink_order.reservation.credit_balance + drink_order.amount
+                            #Create reversal payment history
+                            payment = PaymentModel(
+                                reservation=drink_order.reservation,
+                                posted_by=staff,
+                                channel='direct',
+                                amount=drink_order.amount,
+                                status=PaymentModel.Status.REVERSED,
+                                narration="Payment reversal for drink order with id: {}".format(drink_order.id) 
+                            )
+                            payment.save()
+                        else:
+                            drink_order.reservation.amount_unpaid = drink_order.reservation.amount_unpaid - drink_order.amount
+                        drink_order.reservation.save()
+                    else:
+                        return Response(response_maker(response_type='error',message='Permission Denied!'),status=HTTP_400_BAD_REQUEST)
                 else:
                     return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
                 return Response(response_maker(response_type='success',message="Drink Order Canceled successfully"),status=HTTP_200_OK)

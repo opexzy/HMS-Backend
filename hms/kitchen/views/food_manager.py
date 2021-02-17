@@ -10,9 +10,18 @@ from rest_framework.status import (
 )
 from rest_framework.response import Response
 from staff.models.staff import StaffModel
+from staff.permission.list import CAN_CANCEL_RESERVATION
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
-from staff.permission import use_permission, CAN_ADD_FOOD, CAN_VIEW_FOOD, CAN_EDIT_FOOD, CAN_PLACE_FOOD_ORDER, CAN_VIEW_FOOD_ORDER
+from staff.permission import (
+    use_permission, 
+    has_permission, 
+    CAN_ADD_FOOD, 
+    CAN_VIEW_FOOD, 
+    CAN_EDIT_FOOD, 
+    CAN_PLACE_FOOD_ORDER, 
+    CAN_VIEW_FOOD_ORDER,
+    CAN_CANCEL_ORDER)
 from django.db import transaction
 from hms.settings import ROWS_PER_PAGE
 from django.db.models import Q, F
@@ -23,6 +32,7 @@ from django.utils import timezone, datetime_safe
 from kitchen.models import FoodModel, FoodOrderModel
 from kitchen.serializers import FoodSerializer, FoodOrderSerializer
 from decimal import Decimal
+from reservation.models import PaymentModel
 
 """
     Add New Room
@@ -166,6 +176,7 @@ def order_food(request):
             order.save()
             #Add cost to reservation amount spent
             reservation.amount_spent = reservation.amount_spent + Decimal(float(order.amount))
+            reservation.amount_unpaid = reservation.amount_unpaid + Decimal(float(order.amount))
             reservation.save()
             #Update available room
             food.available = food.available - int(order.quantity)
@@ -229,6 +240,7 @@ def list_order(request, page):
     if data.get("keyword",None):
         reservation_filter = FoodOrderModel.manage.filter(
             (
+                Q(id=data.get("keyword",None)) |
                 Q(reservation__reference=data.get("keyword",None)) |
                 Q(reservation__first_name__icontains=data.get("keyword",None)) |
                 Q(reservation__last_name__icontains=data.get("keyword",None)) |
@@ -292,15 +304,33 @@ def update_order(request):
                     food_order.completed_by = staff
                     food_order.save()
                 elif data.get("status") == FoodOrderModel.Status.CANCELED:
-                    food_order.status = FoodOrderModel.Status.CANCELED
-                    food_order.completed_by = staff
-                    food_order.save()
-                    #Upadte available food in the food model
-                    food_order.food.available = food_order.food.available + food_order.quantity
-                    food_order.food.save()
-                    #Update amount spent
-                    food_order.reservation.amount_spent = food_order.reservation.amount_spent - food_order.amount
-                    food_order.reservation.save()
+                    if has_permission(request.user,CAN_CANCEL_ORDER):
+                        food_order.status = FoodOrderModel.Status.CANCELED
+                        food_order.completed_by = staff
+                        food_order.save()
+                        #Upadte available food in the food model
+                        food_order.food.available = food_order.food.available + food_order.quantity
+                        food_order.food.save()
+                        #Update amount spent
+                        food_order.reservation.amount_spent = food_order.reservation.amount_spent - food_order.amount
+                        if food_order.payment:
+                            #Return amount back to credit balance
+                            food_order.reservation.amount_unpaid = food_order.reservation.amount_unpaid - food_order.amount
+                            #Create reversal payment history
+                            payment = PaymentModel(
+                                reservation=food_order.reservation,
+                                posted_by=staff,
+                                channel='direct',
+                                amount=food_order.amount,
+                                status=PaymentModel.Status.REVERSED,
+                                narration="Payment reversal for food order with id: {}".format(food_order.id) 
+                            )
+                            payment.save()
+                        else:
+                            food_order.reservation.amount_unpaid = food_order.reservation.amount_unpaid - food_order.amount
+                        food_order.reservation.save()
+                    else:
+                        return Response(response_maker(response_type='error',message='Permission Denied!'),status=HTTP_400_BAD_REQUEST)
                 else:
                     return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
                 return Response(response_maker(response_type='success',message="Food Order Canceled successfully"),status=HTTP_200_OK)

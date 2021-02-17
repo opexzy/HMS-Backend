@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^book$',book_room, name="book"),
     url(r'^booking/list$',list_booking, {'page':1}, name="booking_list"),
     url(r'^booking/list/(?P<page>[0-9]+)$', list_booking,  name="booking_list_page"),
+    url(r'^booking/report$',get_booking_report, name="boking_report"),
 ]

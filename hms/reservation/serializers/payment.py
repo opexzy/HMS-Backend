@@ -19,8 +19,6 @@ class PaymentSerializer(serializers.ModelSerializer):
             'posted_by', 
             'channel',
             'amount', 
-            'amount_paid', 
-            'amount_unpaid', 
             'status',
             'narration',
             'timestamp'

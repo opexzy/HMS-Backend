@@ -1,3 +1,4 @@
+from django.db.models.aggregates import Sum
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -7,6 +8,8 @@ from rest_framework.status import (
     HTTP_200_OK
 )
 from rest_framework.response import Response
+from hms_auth.models import auth
+from staff.models.staff import StaffModel
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
 from staff.permission import use_permission, CAN_ADD_ROOM, CAN_VIEW_ROOM, CAN_BOOK_ROOM, CAN_VIEW_BOOKING
@@ -141,6 +144,7 @@ def book_room(request):
         with transaction.atomic():
             reservation = ReservationModel.manage.get(reference=data.get('reference'), status=ReservationModel.Status.ACTIVE)
             room = RoomModel.manage.get(id=data.get('id'))
+            staff = StaffModel.objects.get(auth=request.user)
 
             if room.available < int(data.get('quantity')):
                 return Response(response_maker(response_type='error',message='Avaialble Rooms Less Than Quantity'),status=HTTP_400_BAD_REQUEST)
@@ -152,11 +156,13 @@ def book_room(request):
                 quantity=data.get('quantity'),
                 check_in=datetime.now().date(),
                 check_out=datetime.now().date() + timedelta(days=int(data.get("days"))),
+                booked_by=staff,
                 status=ReservationModel.Status.ACTIVE
             )
             booking.save()
             #Add cost to reservation amount spent
             reservation.amount_spent = reservation.amount_spent + Decimal(float(booking.amount))
+            reservation.amount_unpaid = reservation.amount_unpaid + Decimal(float(booking.amount))
             reservation.save()
             #Update available room
             room.available = room.available - int(booking.quantity)
@@ -220,6 +226,7 @@ def list_booking(request, page):
     if data.get("keyword",None):
         reservation_filter = BookingRecordModel.manage.filter(
             (
+                Q(id=data.get("keyword",None)) |
                 Q(reservation__reference=data.get("keyword",None)) |
                 Q(reservation__first_name__icontains=data.get("keyword",None)) |
                 Q(reservation__last_name__icontains=data.get("keyword",None)) |
@@ -256,3 +263,50 @@ def all_rooms(request):
     rooms = RoomModel.manage.all()
     room_serializer = RoomSerializer(rooms, many=True)
     return Response(response_maker(response_type='success',message='All Rooms',data=room_serializer.data),status=HTTP_200_OK)
+
+
+"""
+    get Room Booking reports
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+def get_booking_report(request): 
+    #Copy dict data
+    data = dict(request._POST)
+    if data.get("status") == 'all':
+        status = BookingRecordModel.Status.options
+    else:
+        status = [data.get("status")]
+
+    # Set timestamp range 
+    if data.get("start_date"):
+        start_date = data.get("start_date").split("T")[0]
+    else:
+        start_date = datetime_safe.datetime(year=1999, month=1, day=1) #datetime(year=1999, month=1, day=1) 
+
+    if data.get("end_date"):  
+        end_date = datetime.strptime("{} 23:59:59".format(data.get("end_date").split("T")[0]),"%Y-%m-%d %H:%M:%S")
+    else:
+        end_date = timezone.now()
+    
+    try:
+        orders = BookingRecordModel.manage.filter(
+            Q(timestamp__range=(start_date,end_date)) &
+            Q(status__in=status)
+        )
+        if data.get("display") != "all":
+            orders = orders.filter(
+                Q(booked_by=StaffModel.objects.get(auth=request.user))
+            )
+        #Get total count & total_amount
+        count = orders.count()
+        total_amount = orders.aggregate(total_amount=Sum("amount"))["total_amount"]
+        order_serializer = BookingRecordSerializer(orders, many=True)
+        return Response(response_maker(response_type='success',message='All Room Bookings',
+            data={
+                "count": count,
+                "total_amount": total_amount,
+                "data": order_serializer.data,
+            }),status=HTTP_200_OK)
+    except Exception as e:
+        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
