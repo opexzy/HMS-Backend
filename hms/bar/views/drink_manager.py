@@ -24,7 +24,7 @@ from staff.permission import (
 from django.db import transaction
 from hms.settings import ROWS_PER_PAGE
 from django.db.models import Q, F
-from reservation.models import ReservationModel
+from reservation.models import ReservationModel, OrderModel
 from reservation.models.reservation import STATUS_OPTIONS
 from datetime import date, datetime, timedelta
 from django.utils import timezone, datetime_safe
@@ -153,6 +153,9 @@ def order_drink(request):
 
             if drink.available < int(data.get('quantity')):
                 return Response(response_maker(response_type='error',message='Avaialble Drinks Less Than Quantity'),status=HTTP_400_BAD_REQUEST)
+            #Create Order reference
+            order_ref = OrderModel(amount=data.get('amount'))
+            order_ref.save()
             #Add Food Order
             if data.get("order_mode") == "direct":
                 order = DrinkOrderModel(
@@ -161,6 +164,7 @@ def order_drink(request):
                     amount=data.get('amount'),
                     quantity=data.get('quantity'),
                     completed_by=StaffModel.objects.get(auth=request.user),
+                    order= order_ref,
                     status=DrinkOrderModel.Status.COMPLETED
                 )
             else:
@@ -170,6 +174,7 @@ def order_drink(request):
                     amount=data.get('amount'),
                     quantity=data.get('quantity'),
                     registered_by=StaffModel.objects.get(auth=request.user),
+                    order= order_ref,
                     status=DrinkOrderModel.Status.PENDING
                 )
             order.save()
@@ -240,6 +245,7 @@ def list_order(request, page):
         reservation_filter = DrinkOrderModel.manage.filter(
             (
                 Q(id=data.get("keyword",None)) |
+                Q(order__order_ref=data.get("keyword",None)) |
                 Q(reservation__reference=data.get("keyword",None)) |
                 Q(reservation__first_name__icontains=data.get("keyword",None)) |
                 Q(reservation__last_name__icontains=data.get("keyword",None)) |

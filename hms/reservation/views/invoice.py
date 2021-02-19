@@ -40,9 +40,9 @@ from decimal import Decimal
 def get_invoice(request, reference): 
     try:
         reservation = ReservationModel.manage.get(reference=reference)
-        food_orders = FoodOrderModel.manage.filter(reservation=reservation)
-        drink_orders = DrinkOrderModel.manage.filter(reservation=reservation)
-        room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
+        food_orders = FoodOrderModel.manage.filter(reservation=reservation).exclude(status=FoodOrderModel.Status.CANCELED)
+        drink_orders = DrinkOrderModel.manage.filter(reservation=reservation).exclude(status=DrinkOrderModel.Status.CANCELED)
+        room_bookings = BookingRecordModel.manage.filter(reservation=reservation).exclude(status=BookingRecordModel.Status.CANCELED)
 
         #Get invoice amounts
         food = food_orders.aggregate(total_food=Sum("amount"))
@@ -82,12 +82,11 @@ def make_payment(request):
     #Add new Reservation to database
     try:
         reservation = ReservationModel.manage.get(reference=data.get("reference"))
-        if reservation.status == ReservationModel.Status.CHECKED_OUT:
-            return Response(response_maker(response_type='success',message="Reservation has been previously checked out"),status=HTTP_400_BAD_REQUEST)
+        if reservation.status != ReservationModel.Status.ACTIVE:
+            return Response(response_maker(response_type='success',message="Reservation has been previously closed or canceled"),status=HTTP_400_BAD_REQUEST)
         if float(data.get('amount')) <= 0:
             return Response(response_maker(response_type='success',message="Amount can not be less than or equal zero"),status=HTTP_400_BAD_REQUEST)
         staff = StaffModel.objects.get(auth=request.user)
-        channel = data.get("channel")
         narration = "Not Available"
         if data.get("channel") == "cash":
             narration = "Cash collected by: {} {}".format(staff.first_name, staff.last_name)
@@ -118,14 +117,14 @@ def make_payment(request):
                 reservation.credit_balance = 0 + excess_amount
             else:
                 reservation.credit_balance = reservation.credit_balance + excess_amount
-            if reservation.amount_unpaid <= 0:
-                reservation.status = ReservationModel.Status.CHECKED_OUT
+            #if reservation.amount_unpaid <= 0:
+                #reservation.status = ReservationModel.Status.CHECKED_OUT
                 #Relase every room booked on this reservation
-                room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
-                for booking in room_bookings:
-                    room = RoomModel.manage.get(pk=booking.room.pk)
-                    room.available = room.available + int(booking.quantity)
-                    room.save()
+                #room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
+                #for booking in room_bookings:
+                    #room = RoomModel.manage.get(pk=booking.room.pk)
+                    #room.available = room.available + int(booking.quantity)
+                    #room.save()
             reservation.save()
         res_serializer = ReservationSerializer(reservation)
         return Response(response_maker(response_type='success',message="Payment made successfully",data=res_serializer.data),status=HTTP_200_OK)

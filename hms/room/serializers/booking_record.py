@@ -8,6 +8,8 @@ from room.models import BookingRecordModel
 class BookingRecordSerializer(serializers.ModelSerializer):
     
     reference = serializers.SerializerMethodField("get_reference")
+    reservation_type = serializers.SerializerMethodField("get_reservation_type")
+    corporate_name = serializers.SerializerMethodField("get_corporate_name")
     first_name = serializers.SerializerMethodField("get_first_name")
     last_name = serializers.SerializerMethodField("get_last_name")
     room = serializers.SerializerMethodField("get_room")
@@ -17,7 +19,9 @@ class BookingRecordSerializer(serializers.ModelSerializer):
         model = BookingRecordModel
         fields = [
             'id', 
-            'reference', 
+            'reference',
+            'reservation_type',
+            'corporate_name', 
             'first_name',
             'last_name',
             'room',
@@ -34,6 +38,18 @@ class BookingRecordSerializer(serializers.ModelSerializer):
     def get_reference(self, obj):
         if obj.reservation:
             return obj.reservation.reference
+        else:
+            return None
+
+    def get_reservation_type(self, obj):
+        if obj.reservation:
+            return obj.reservation.reservation_type
+        else:
+            return None
+    
+    def get_corporate_name(self, obj):
+        if obj.reservation:
+            return obj.reservation.corporate_name
         else:
             return None
 

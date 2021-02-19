@@ -73,9 +73,14 @@ CAN_REVERSE_PAYMENT = 'can_reverse_payment'
 #This permission is required to generate kitchen report
 CAN_VIEW_KITCHEN_REPORT = 'can_view_kitchen_report'
 #
-#This permission is required to order food
+#This permission is required to cancel order
 CAN_CANCEL_ORDER = 'can_cancel_order'
 #
+#This permission is required to update bookings
+CAN_UPDATE_BOOKINGS = 'can_update_bookings'
+#
+#This permission is required to close reservation
+CAN_CLOSE_RESERVATION = 'can_close_reservation'
 
 
 """ ADMINISTRATIVE PERMISSIONS """

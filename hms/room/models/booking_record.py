@@ -41,9 +41,12 @@ class BookingRecordModel(models.Model):
 
     class Status:
         ACTIVE = "active"
-        CLOSED = "closed"
-        OVERDUE = "overdue"
-        options = [ACTIVE, CLOSED, OVERDUE]
+        CHECKED_IN = "checked_in"
+        CHECKED_OUT = "checked_out"
+        CANCELED = "canceled"
+
+        options = [ACTIVE, CHECKED_IN, CHECKED_OUT, CANCELED]
+
 
 
     class Meta:

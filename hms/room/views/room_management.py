@@ -12,7 +12,7 @@ from hms_auth.models import auth
 from staff.models.staff import StaffModel
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
-from staff.permission import use_permission, CAN_ADD_ROOM, CAN_VIEW_ROOM, CAN_BOOK_ROOM, CAN_VIEW_BOOKING
+from staff.permission import use_permission, CAN_ADD_ROOM, CAN_VIEW_ROOM, CAN_BOOK_ROOM, CAN_VIEW_BOOKING, CAN_UPDATE_BOOKINGS
 from django.db import transaction
 from hms.settings import ROWS_PER_PAGE
 from django.db.models import Q, F
@@ -310,3 +310,39 @@ def get_booking_report(request):
             }),status=HTTP_200_OK)
     except Exception as e:
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+
+
+"""
+    cancel Reservation
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+@use_permission(CAN_UPDATE_BOOKINGS)
+def update_booking_status(request): 
+    data = dict(request._POST)
+    try:
+        booking = BookingRecordModel.manage.get(pk=data.get("id"))
+        with transaction.atomic():
+            #Update reservation if status is active
+            if (data.get("action") == "canceled") and (booking.status == BookingRecordModel.Status.ACTIVE):
+                if (booking.status == BookingRecordModel.Status.ACTIVE) and (booking.reservation.status == ReservationModel.Status.ACTIVE):
+                    booking.reservation.amount_spent = booking.reservation.amount_spent - booking.amount
+                    booking.reservation.credit_balance = booking.reservation.credit_balance + booking.amount
+                    booking.reservation.save()
+                booking.room.available = booking.room.available + booking.quantity
+                booking.room.save()
+                booking.status = BookingRecordModel.Status.CANCELED
+                booking.save()
+            elif (data.get("action") == "checked_in") and (booking.status == BookingRecordModel.Status.ACTIVE):
+                booking.status = BookingRecordModel.Status.CHECKED_IN
+                booking.save()
+            elif (data.get("action") == "checked_out") and (booking.status == BookingRecordModel.Status.CHECKED_IN):
+                booking.room.available = booking.room.available + booking.quantity
+                booking.room.save()
+                booking.status = BookingRecordModel.Status.CHECKED_OUT
+                booking.save()
+        return Response(response_maker(response_type='success',message='Booking status updated Successfully'),status=HTTP_200_OK)
+    except BookingRecordModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message='Booking Record deos not exist or not active'),status=HTTP_400_BAD_REQUEST)
+    except Exception:
+        return Response(response_maker(response_type='error',message='Unknown internal error'),status=HTTP_400_BAD_REQUEST)

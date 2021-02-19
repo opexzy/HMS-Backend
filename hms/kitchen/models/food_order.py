@@ -6,7 +6,7 @@ from .food import FoodModel
 from reservation.models import ReservationModel
 from decimal import Decimal
 from staff.models import StaffModel
-from reservation.models import PaymentModel
+from reservation.models import PaymentModel, OrderModel
 
 STATUS_OPTIONS = ["active","closed"]
 
@@ -32,6 +32,7 @@ class FoodOrderModel(models.Model):
     registered_by = models.ForeignKey(StaffModel, on_delete=models.DO_NOTHING, null=True, verbose_name="Registered By")
     completed_by = models.ForeignKey(StaffModel, on_delete=models.DO_NOTHING, null=True, related_name="food_order_completed_by", verbose_name="Commpleted By")
     status = models.CharField(max_length=15, verbose_name="Status")
+    order = models.ForeignKey(OrderModel, null=True, on_delete=models.DO_NOTHING, verbose_name="Order Id")
     payment = models.ForeignKey(PaymentModel, null=True, on_delete=models.DO_NOTHING, verbose_name="Payment Id")
     timestamp = models.DateTimeField(auto_now=True, verbose_name='Timestamp')
 

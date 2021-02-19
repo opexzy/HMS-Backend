@@ -8,6 +8,7 @@ from rest_framework.status import (
 )
 from rest_framework.response import Response
 from staff.models import staff
+from staff.permission.list import CAN_CLOSE_RESERVATION
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
 from staff.permission import use_permission, CAN_MAKE_RESERVATION, CAN_VIEW_RESERVATION, CAN_CANCEL_RESERVATION
@@ -24,6 +25,7 @@ from django.utils import timezone, datetime_safe
 from room.models import RoomModel, BookingRecordModel
 from room.serializers import RoomSerializer, BookingRecordSerializer
 from decimal import Decimal
+from reservation.models import PaymentModel
 
 
 """
@@ -56,6 +58,25 @@ def make_reservation(request):
 
                 if room.available < int(data.get('quantity')):
                     return Response(response_maker(response_type='error',message='Avaialble Rooms Less Than Quantity'),status=HTTP_400_BAD_REQUEST)
+                #Add Payment to history
+                channel = request._POST.get("channel")
+                narration = "Not available"
+                if request._POST.get("channel") == "cash":
+                    narration = "Cash collected by: {} {}".format(staff.first_name, staff.last_name)
+                elif request._POST.get("channel") == "pos":
+                    narration = "Payment made with POS using debit/credit card"
+                elif request._POST.get("channel") == "transfer":
+                    narration = "Customer made bank transfer with reference id/NO: {}".format(request._POST.get("narration"))
+                payment = PaymentModel(
+                    reservation=reservation,
+                    posted_by=staff,
+                    channel=channel,
+                    amount=float(request._POST.get("total_price")),
+                    status=PaymentModel.Status.COMPLETED,
+                    narration=narration    
+                )
+                payment.save()
+
                 #Add room booking
                 booking = BookingRecordModel(
                     reservation=reservation,
@@ -65,17 +86,17 @@ def make_reservation(request):
                     check_in=datetime.now().date(),
                     check_out=datetime.now().date() + timedelta(days=int(data.get("days"))),
                     booked_by=staff,
+                    payment=payment,
                     status=ReservationModel.Status.ACTIVE
                 )
                 booking.save()
+
                 #Add cost to reservation amount spent
                 reservation.amount_spent = reservation.amount_spent + Decimal(float(booking.amount))
-                reservation.amount_unpaid = reservation.amount_unpaid + Decimal(float(booking.amount))
                 reservation.save()
                 #Update available room
                 room.available = room.available - int(booking.quantity)
                 room.save()
-
             res_serializer = ReservationSerializer(reservation)
         return Response(response_maker(response_type='success',message="Reservation made successfully",data=res_serializer.data),status=HTTP_200_OK)
     except KeyError:
@@ -216,20 +237,86 @@ def get_reservation(request, reference):
 @api_view(['GET']) #Only accept post request
 @use_permission(CAN_CANCEL_RESERVATION)
 def cancel_reservation(request, reference): 
-
     try:
         with transaction.atomic():
+            staff = StaffModel.objects.get(auth=request.user)
             reservation = ReservationModel.manage.get(reference=reference, status=ReservationModel.Status.ACTIVE)
-            if reservation.amount_unpaid <= 0:
-                reservation.status=ReservationModel.Status.CANCELED
-                reservation.save()
-                #Relase every room booked on this reservation
+            if (reservation.amount_unpaid <= 0) and (reservation.amount_spent <= 0):
+                #Release every room booked on this reservation if possible
                 room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
                 for booking in room_bookings:
-                    room = RoomModel.manage.get(pk=booking.room.pk)
-                    room.available = room.available + int(booking.quantity)
-                    room.save()
+                    if(booking.status == BookingRecordModel.Status.ACTIVE):
+                        booking.status = BookingRecordModel.Status.CANCELED
+                        booking.save()
+                        booking.reservation.amount_spent = booking.reservation.amount_spent - booking.amount
+                        booking.reservation.credit_balance = booking.reservation.credit_balance - booking.amount
+                        booking.reservation.save()
+                        room = RoomModel.manage.get(pk=booking.room.pk)
+                        room.available = room.available + int(booking.quantity)
+                        room.save()
+                reservation = ReservationModel.manage.get(reference=reference)
+                reservation.status=ReservationModel.Status.CANCELED
+                reservation.save() 
+                #Reverse credit balance
+                payment = PaymentModel(
+                    reservation=reservation,
+                    posted_by=staff,
+                    channel="direct",
+                    amount=reservation.credit_balance,
+                    status=PaymentModel.Status.REVERSED,
+                    narration="Reversed canceled reservation credit balance"    
+                )
+                payment.save()
+            else:
+                return Response(response_maker(response_type='error',message='Can not cancel a reservation with valid orders, use close instead'),status=HTTP_400_BAD_REQUEST)
         return Response(response_maker(response_type='success',message='Customer Reservation Canceled Successfully'),status=HTTP_200_OK)
+    except ReservationModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message='Reservation deos not exist or not active'),status=HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+
+
+"""
+    close Reservation
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept post request
+@use_permission(CAN_CLOSE_RESERVATION)
+def close_reservation(request, reference): 
+    try:
+        with transaction.atomic():
+            staff = StaffModel.objects.get(auth=request.user)
+            reservation = ReservationModel.manage.get(reference=reference, status=ReservationModel.Status.ACTIVE)
+            if reservation.amount_unpaid <= 0:
+                #Release every room booked on this reservation if possible
+                room_bookings = BookingRecordModel.manage.filter(reservation=reservation)
+                for booking in room_bookings:
+                    if(booking.status == BookingRecordModel.Status.ACTIVE):
+                        booking.status = BookingRecordModel.Status.CANCELED
+                        booking.save()
+                        booking.reservation.amount_spent = booking.reservation.amount_spent - booking.amount
+                        booking.reservation.credit_balance = booking.reservation.credit_balance - booking.amount
+                        booking.reservation.save()
+                        room = RoomModel.manage.get(pk=booking.room.pk)
+                        room.available = room.available + int(booking.quantity)
+                        room.save()
+                reservation = ReservationModel.manage.get(reference=reference)
+                reservation.status=ReservationModel.Status.CLOSED
+                reservation.save() 
+                #Reverse credit balance
+                if reservation.credit_balance > 0:
+                    payment = PaymentModel(
+                        reservation=reservation,
+                        posted_by=staff,
+                        channel="direct",
+                        amount=reservation.credit_balance,
+                        status=PaymentModel.Status.REVERSED,
+                        narration="Reversed closed reservation credit balance"    
+                    )
+                    payment.save()
+                return Response(response_maker(response_type='success',message='Customer Reservation Cloased Successfully'),status=HTTP_200_OK)
+            else:
+                return Response(response_maker(response_type='error',message='Can not close a reservation with unpaid amount'),status=HTTP_400_BAD_REQUEST)
     except ReservationModel.DoesNotExist:
         return Response(response_maker(response_type='error',message='Reservation deos not exist or not active'),status=HTTP_400_BAD_REQUEST)
     except Exception:

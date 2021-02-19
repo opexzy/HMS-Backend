@@ -1,4 +1,5 @@
 from re import error
+from django.db.models.aggregates import Sum
 from django.db.models.query import InstanceCheckMeta
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
@@ -10,13 +11,14 @@ from rest_framework.status import (
 )
 from rest_framework.response import Response
 from staff.models.staff import StaffModel
+from staff.permission.list import CAN_PLACE_DRINK_ORDER
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
 from staff.permission import use_permission, CAN_ADD_FOOD, CAN_VIEW_FOOD, CAN_EDIT_FOOD, CAN_PLACE_FOOD_ORDER, CAN_VIEW_FOOD_ORDER
 from django.db import transaction
 from hms.settings import ROWS_PER_PAGE
 from django.db.models import Q, F
-from reservation.models import ReservationModel
+from reservation.models import ReservationModel, OrderModel
 from reservation.models.reservation import STATUS_OPTIONS
 from datetime import date, datetime, timedelta
 from django.utils import timezone, datetime_safe
@@ -24,6 +26,7 @@ from kitchen.models import FoodModel, FoodOrderModel
 from bar.models import DrinkModel, DrinkOrderModel
 from room.models import BookingRecordModel, RoomModel
 from kitchen.serializers import FoodSerializer, FoodOrderSerializer
+from bar.serializers import DrinkOrderSerializer
 from decimal import Decimal
 from reservation.exception import QuantityOutOfRange
 from reservation.models import PaymentModel
@@ -33,7 +36,7 @@ from reservation.models import PaymentModel
 """
 @request_data_normalizer #Normalize request POST and GET data
 @api_view(['POST']) #Only accept post request
-#@use_permission(CAN_PLACE_FOOD_ORDER)
+@use_permission([CAN_PLACE_FOOD_ORDER, CAN_PLACE_DRINK_ORDER])
 def quick_order(request, reference): 
     #Copy dict data
     data = request._POST.getlist("orders")
@@ -83,7 +86,9 @@ def quick_order(request, reference):
                 )
                 payment.save()
             else:
-                payment = None        
+                payment = None
+            order_ref = OrderModel(amount=request._POST.get("total_amount"))
+            order_ref.save()        
             #Register order as pending in database
             for order in data:
                 if order.get("type") == "foods":
@@ -95,6 +100,7 @@ def quick_order(request, reference):
                         quantity=order.get("quantity"),
                         registered_by=staff,
                         payment=payment,
+                        order=order_ref,
                         status=FoodOrderModel.Status.PENDING
                     ).save()
                     #Deduct qauntity from food model
@@ -111,6 +117,7 @@ def quick_order(request, reference):
                         quantity=order.get("quantity"),
                         registered_by=staff,
                         payment=payment,
+                        order=order_ref,
                         status=DrinkOrderModel.Status.PENDING
                     ).save()
                     #Deduct qauntity from food model
@@ -118,7 +125,8 @@ def quick_order(request, reference):
                         raise QuantityOutOfRange
                     drink.available = int(drink.available) - int(order.get("quantity"))
                     drink.save()
-            return Response(response_maker(response_type='success',message="Order Placed successfully"),status=HTTP_200_OK)
+            return Response(response_maker(response_type='success',message="Order Placed successfully", data={
+                "order_ref":order_ref.order_ref,"order_date":timezone.now()}),status=HTTP_200_OK)
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
     except ReservationModel.DoesNotExist:
@@ -127,3 +135,52 @@ def quick_order(request, reference):
         return Response(response_maker(response_type='error',message="Quantity out of available item range"),status=HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+
+
+"""
+    List order History: Can also apply filters
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept get request
+def get_my_orders(request):
+    #Copy dict data
+    staff = StaffModel.objects.get(auth=request.user)
+    data = request._POST
+
+    # Set order status
+    if data.getlist("status"):
+        status_query = data.getlist("status")
+    else:
+        status_query =  FoodOrderModel.Status.options 
+
+        # Set timestamp range 
+    if data.get("startDate"):
+        start_date = data.get("startDate").split("T")[0]
+    else:
+        start_date = datetime_safe.datetime(year=1999, month=1, day=1) #datetime(year=1999, month=1, day=1) 
+
+    if data.get("endDate"):  
+        end_date = datetime.strptime("{} 23:59:59".format(data.get("endDate").split("T")[0]),"%Y-%m-%d %H:%M:%S")
+    else:
+        end_date = timezone.now()  
+
+    food_order_filter = FoodOrderModel.manage.filter(
+        (Q(registered_by=staff) | Q(completed_by=staff)) 
+        &
+        (Q(timestamp__range=(start_date,end_date)) & Q(status__in=status_query))
+        ).order_by("-timestamp")
+
+    drink_order_filter = DrinkOrderModel.manage.filter(
+        (Q(registered_by=staff) | Q(completed_by=staff)) 
+        &
+        (Q(timestamp__range=(start_date,end_date)) & Q(status__in=status_query))
+        ).order_by("-timestamp")
+    
+    total_drink = drink_order_filter.aggregate(total_drink=Sum("amount"))["total_drink"]
+    total_food = food_order_filter.aggregate(total_food=Sum("amount"))["total_food"]
+    return Response(response_maker(response_type='success',message='All Payment',data={
+        "total_drink":total_drink,
+        "total_food": total_food,
+        "food_orders":FoodOrderSerializer(food_order_filter).data,
+        "drink_orders":DrinkOrderSerializer(drink_order_filter).data
+    }),status=HTTP_200_OK)
