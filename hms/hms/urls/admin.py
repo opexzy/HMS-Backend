@@ -22,5 +22,7 @@ urlpatterns = [
     path('room/',include(('room.urls','room'), namespace='room')),
     path('kitchen/',include(('kitchen.urls','kitchen'), namespace='kitchen')),
     path('bar/',include(('bar.urls','bar'), namespace='bar')),
+    path('coupon/',include(('coupon.urls','bar'), namespace='coupon')),
+    path('option/',include(('options.urls','option'), namespace='option')),
     #path('customer/',include(('customer.urls','customer'), namespace='customer')),
 ]

@@ -44,7 +44,8 @@ class PaymentModel(models.Model):
         POS = "pos"
         CASH = "cash"
         TRANSFER = "transfer"
-        options = [DIRECT, POS, CASH, TRANSFER]
+        COUPON = "coupon"
+        options = [DIRECT, POS, CASH, TRANSFER, COUPON]
 
     class Meta:
         db_table = "hms_payment"

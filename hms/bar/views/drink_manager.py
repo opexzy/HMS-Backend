@@ -8,6 +8,7 @@ from rest_framework.status import (
     HTTP_200_OK
 )
 from rest_framework.response import Response
+from options.models.options import OptionModel
 from staff.models.staff import StaffModel
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
@@ -49,7 +50,8 @@ def add_drink(request):
             description=data.get('description'),
             price=data.get('price'),
             metric=data.get('metric'),
-            available=data.get('available')
+            available=data.get('available'),
+            group= OptionModel.manage.get(pk=data.get('group')),
         )
         drink.save()
         drink_serializer = DrinkSerializer(drink)
@@ -123,12 +125,14 @@ def update_drink(request):
     data = dict(request._POST)
     try:
         room = DrinkModel.manage.get(pk=data.get("id",None))
+    
         try:
             room.name = data.get("name", None)
             room.description = data.get("description", None)
             room.price = data.get("price", None)
             room.metric = data.get("metric", None)
             room.available = data.get("available", None)
+            group = OptionModel.manage.get(pk=data.get('group'))
             room.save()
             return Response(response_maker(response_type='success',message='Drink updated successfully'),status=HTTP_200_OK)
         except Exception as e:
@@ -244,7 +248,6 @@ def list_order(request, page):
     if data.get("keyword",None):
         reservation_filter = DrinkOrderModel.manage.filter(
             (
-                Q(id=data.get("keyword",None)) |
                 Q(order__order_ref=data.get("keyword",None)) |
                 Q(reservation__reference=data.get("keyword",None)) |
                 Q(reservation__first_name__icontains=data.get("keyword",None)) |
@@ -294,7 +297,7 @@ def get_all_drinks(request):
 """
 @request_data_normalizer #Normalize request POST and GET data
 @api_view(['POST']) #Only accept post request
-@use_permission(CAN_PLACE_DRINK_ORDER)
+@use_permission(CAN_VIEW_DRINK_ORDER)
 def update_order(request): 
     #Copy dict data
     data = dict(request._POST)
@@ -322,15 +325,15 @@ def update_order(request):
                             #Return amount back to credit balance
                             drink_order.reservation.credit_balance = drink_order.reservation.credit_balance + drink_order.amount
                             #Create reversal payment history
-                            payment = PaymentModel(
-                                reservation=drink_order.reservation,
-                                posted_by=staff,
-                                channel='direct',
-                                amount=drink_order.amount,
-                                status=PaymentModel.Status.REVERSED,
-                                narration="Payment reversal for drink order with id: {}".format(drink_order.id) 
-                            )
-                            payment.save()
+                            #payment = PaymentModel(
+                                #reservation=drink_order.reservation,
+                                #posted_by=staff,
+                                #channel='direct',
+                                #amount=drink_order.amount,
+                                #status=PaymentModel.Status.REVERSED,
+                                #narration="Payment reversal for drink order with id: {}".format(drink_order.id) 
+                            #)
+                            #payment.save()
                         else:
                             drink_order.reservation.amount_unpaid = drink_order.reservation.amount_unpaid - drink_order.amount
                         drink_order.reservation.save()
@@ -395,3 +398,16 @@ def get_order_report(request):
             }),status=HTTP_200_OK)
     except Exception as e:
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+
+"""
+    Get all pending drink orders count
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept post request
+def get_pending_drink_order(request): 
+    try:
+        count = DrinkOrderModel.manage.filter(status=DrinkOrderModel.Status.PENDING).count()
+        return Response(response_maker(response_type='success',message='All Drink Count',
+            count=count),status=HTTP_200_OK)
+    except Exception:
+        return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)

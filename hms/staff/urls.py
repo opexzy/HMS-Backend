@@ -5,6 +5,7 @@ from .views.permission_management import *
 urlpatterns = [
     url(r'^register$',register_staff, name="register"),
     url(r'^update$',update_staff, name="update"),
+    url(r'^update-pwd$',update_password, name="update_password"),
     url(r'^list$',list_staff, {'page':1}, name="list"),
     url(r'^list/(?P<page>[0-9]+)$', list_staff,  name="list_page"),
     url(r'^permission$', list_permission, {'staff_id':None}, name="permission"),

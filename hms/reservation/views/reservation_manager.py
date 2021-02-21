@@ -53,6 +53,25 @@ def make_reservation(request):
                 credit_balance=data.get('credit_balance'),
             )
             reservation.save()
+            #Add credit balance payment to history
+            if Decimal(reservation.credit_balance) > Decimal(0) :
+                narration = "Not available"
+                if data.get('credit_channel') == "cash":
+                    narration = "Cash collected by: {} {}".format(staff.first_name, staff.last_name)
+                elif data.get('credit_channel') == "pos":
+                    narration = "Payment made with POS using debit/credit card"
+                elif data.get('credit_channel') == "transfer":
+                    narration = "Customer made bank transfer with reference id/NO: {}".format(request._POST.get("narration"))
+                payment = PaymentModel(
+                    reservation=reservation,
+                    posted_by=staff,
+                    channel=data.get('credit_channel'),
+                    amount=reservation.credit_balance,
+                    status=PaymentModel.Status.COMPLETED,
+                    narration=narration    
+                )
+                payment.save()
+
             if data.get("book_room") == "true":
                 room = RoomModel.manage.get(id=data.get('room'))
 
@@ -158,6 +177,7 @@ def list_reservation(request, page):
                 Q(reference=data.get("keyword",None)) |
                 Q(first_name__icontains=data.get("keyword",None)) |
                 Q(last_name__icontains=data.get("keyword",None)) |
+                Q(corporate_name__icontains=data.get("keyword",None)) |
                 Q(phone_number=data.get("keyword",None))
             ) 
             &
@@ -177,6 +197,7 @@ def list_reservation(request, page):
                 Q(reference=data.get("keyword",None)) |
                 Q(first_name__icontains=data.get("keyword",None)) |
                 Q(last_name__icontains=data.get("keyword",None)) |
+                Q(corporate_name__icontains=data.get("keyword",None)) |
                 Q(phone_number=data.get("keyword",None))
             ) 
             &

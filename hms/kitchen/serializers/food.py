@@ -18,7 +18,8 @@ class FoodSerializer(serializers.ModelSerializer):
             'price',
             'status', 
             'metric', 
-            'available'
+            'available',
+            'group'
         ]
 
     def get_status(self, obj):

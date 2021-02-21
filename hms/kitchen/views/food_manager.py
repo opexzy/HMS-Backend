@@ -9,6 +9,7 @@ from rest_framework.status import (
     HTTP_200_OK
 )
 from rest_framework.response import Response
+from options.models.options import OptionModel
 from staff.models.staff import StaffModel
 from staff.permission.list import CAN_CANCEL_RESERVATION
 from utils.randstr import get_token
@@ -50,6 +51,7 @@ def add_food(request):
             description=data.get('description'),
             price=data.get('price'),
             metric=data.get('metric'),
+            group= OptionModel.manage.get(pk=data.get('group')),
             available=data.get('available')
         )
         food.save()
@@ -130,6 +132,7 @@ def update_food(request):
             room.price = data.get("price", None)
             room.metric = data.get("metric", None)
             room.available = data.get("available", None)
+            room.group = OptionModel.manage.get(pk=data.get('group'))
             room.save()
             return Response(response_maker(response_type='success',message='Food updated successfully'),status=HTTP_200_OK)
         except Exception as e:
@@ -244,7 +247,6 @@ def list_order(request, page):
     if data.get("keyword",None):
         reservation_filter = FoodOrderModel.manage.filter(
             (
-                Q(id=data.get("keyword",None)) |
                 Q(order__order_ref=data.get("keyword",None)) |
                 Q(reservation__reference=data.get("keyword",None)) |
                 Q(reservation__first_name__icontains=data.get("keyword",None)) |
@@ -294,7 +296,7 @@ def get_all_foods(request):
 """
 @request_data_normalizer #Normalize request POST and GET data
 @api_view(['POST']) #Only accept post request
-@use_permission(CAN_PLACE_FOOD_ORDER)
+@use_permission(CAN_VIEW_FOOD_ORDER)
 def update_order(request): 
     #Copy dict data
     data = dict(request._POST)
@@ -322,15 +324,15 @@ def update_order(request):
                             #Return amount back to credit balance
                             food_order.reservation.amount_unpaid = food_order.reservation.amount_unpaid - food_order.amount
                             #Create reversal payment history
-                            payment = PaymentModel(
-                                reservation=food_order.reservation,
-                                posted_by=staff,
-                                channel='direct',
-                                amount=food_order.amount,
-                                status=PaymentModel.Status.REVERSED,
-                                narration="Payment reversal for food order with id: {}".format(food_order.id) 
-                            )
-                            payment.save()
+                            #payment = PaymentModel(
+                                #reservation=food_order.reservation,
+                                #posted_by=staff,
+                                #channel='direct',
+                                #amount=food_order.amount,
+                                #status=PaymentModel.Status.REVERSED,
+                                #narration="Payment reversal for food order with id: {}".format(food_order.id) 
+                            #)
+                            #payment.save()
                         else:
                             food_order.reservation.amount_unpaid = food_order.reservation.amount_unpaid - food_order.amount
                         food_order.reservation.save()
@@ -395,3 +397,18 @@ def get_order_report(request):
             }),status=HTTP_200_OK)
     except Exception as e:
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+
+
+
+"""
+    Get all pending food orders count
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept post request
+def get_pending_food_order(request): 
+    try:
+        count = FoodOrderModel.manage.filter(status=FoodOrderModel.Status.PENDING).count()
+        return Response(response_maker(response_type='success',message='All Food Count',
+            count=count),status=HTTP_200_OK)
+    except Exception:
+        return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)

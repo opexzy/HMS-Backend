@@ -2,6 +2,7 @@
     This model defines Food Table
 """
 from django.db import models, transaction
+from options.models.options import OptionModel
 from staff.models import StaffModel
 from decimal import Decimal
 
@@ -28,6 +29,7 @@ class FoodModel(models.Model):
     price =  models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Food Price")
     metric = models.CharField(max_length=255, verbose_name="Metric")
     available = models.IntegerField(verbose_name="Available Foom")
+    group = models.ForeignKey(OptionModel, null=True, default=None, on_delete=models.DO_NOTHING, verbose_name="Food Group")
 
     manage = FoodModelManager()
 

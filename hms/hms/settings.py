@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'room',
     'bar',
     'kitchen',
+    'coupon',
+    'vendor',
+    'options'
 ]
 
 MIDDLEWARE = [

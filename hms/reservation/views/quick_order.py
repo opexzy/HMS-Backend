@@ -148,39 +148,50 @@ def get_my_orders(request):
     data = request._POST
 
     # Set order status
-    if data.getlist("status"):
-        status_query = data.getlist("status")
+    if data.get("status") == 'all':
+        status_query = FoodOrderModel.Status.options
     else:
-        status_query =  FoodOrderModel.Status.options 
+        status_query = [data.get("status")] 
 
         # Set timestamp range 
-    if data.get("startDate"):
-        start_date = data.get("startDate").split("T")[0]
+    if data.get("start_date"):
+        start_date = data.get("start_date").split("T")[0]
     else:
-        start_date = datetime_safe.datetime(year=1999, month=1, day=1) #datetime(year=1999, month=1, day=1) 
+        start_date = timezone.now().date() #datetime(year=1999, month=1, day=1) 
 
-    if data.get("endDate"):  
-        end_date = datetime.strptime("{} 23:59:59".format(data.get("endDate").split("T")[0]),"%Y-%m-%d %H:%M:%S")
+    if data.get("end_date"):  
+        end_date = datetime.strptime("{} 23:59:59".format(data.get("end_date").split("T")[0]),"%Y-%m-%d %H:%M:%S")
     else:
         end_date = timezone.now()  
 
     food_order_filter = FoodOrderModel.manage.filter(
-        (Q(registered_by=staff) | Q(completed_by=staff)) 
+        (
+            Q(registered_by=staff) | 
+            Q(completed_by=staff)) 
         &
-        (Q(timestamp__range=(start_date,end_date)) & Q(status__in=status_query))
-        ).order_by("-timestamp")
-
+        (
+            Q(timestamp__range=(start_date,end_date)) & 
+            Q(status__in=status_query)
+        )
+    ).order_by("-timestamp")
+    
     drink_order_filter = DrinkOrderModel.manage.filter(
-        (Q(registered_by=staff) | Q(completed_by=staff)) 
+        (
+            Q(registered_by=staff) | 
+            Q(completed_by=staff)
+        ) 
         &
-        (Q(timestamp__range=(start_date,end_date)) & Q(status__in=status_query))
-        ).order_by("-timestamp")
+        (
+            Q(timestamp__range=(start_date,end_date)) & 
+            Q(status__in=status_query)
+        )
+    ).order_by("-timestamp")
     
     total_drink = drink_order_filter.aggregate(total_drink=Sum("amount"))["total_drink"]
     total_food = food_order_filter.aggregate(total_food=Sum("amount"))["total_food"]
     return Response(response_maker(response_type='success',message='All Payment',data={
         "total_drink":total_drink,
         "total_food": total_food,
-        "food_orders":FoodOrderSerializer(food_order_filter).data,
-        "drink_orders":DrinkOrderSerializer(drink_order_filter).data
+        "food_orders":FoodOrderSerializer(food_order_filter,many=True).data,
+        "drink_orders":DrinkOrderSerializer(drink_order_filter,many=True).data
     }),status=HTTP_200_OK)

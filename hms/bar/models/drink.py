@@ -4,6 +4,8 @@
 from django.db import models, transaction
 from decimal import Decimal
 
+from options.models.options import OptionModel
+
 
 STATUS_OPTIONS = ["active","closed"]
 
@@ -27,6 +29,7 @@ class DrinkModel(models.Model):
     price =  models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Drink Price")
     metric = models.CharField(max_length=255, verbose_name="Metric")
     available = models.IntegerField(verbose_name="Available Drink")
+    group = models.ForeignKey(OptionModel, null=True, default=None, on_delete=models.DO_NOTHING, verbose_name="Drink Group")
 
     manage = DrinkModelManager()
 

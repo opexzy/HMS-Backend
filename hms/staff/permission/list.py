@@ -81,6 +81,12 @@ CAN_UPDATE_BOOKINGS = 'can_update_bookings'
 #
 #This permission is required to close reservation
 CAN_CLOSE_RESERVATION = 'can_close_reservation'
+#
+#This permission is required to add coupon
+CAN_ADD_COUPON = 'can_add_coupon'
+#
+#This permission is required to view coupon
+CAN_VIEW_COUPON = 'can_view_coupon'
 
 
 """ ADMINISTRATIVE PERMISSIONS """

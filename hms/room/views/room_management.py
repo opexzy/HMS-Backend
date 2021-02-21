@@ -226,7 +226,6 @@ def list_booking(request, page):
     if data.get("keyword",None):
         reservation_filter = BookingRecordModel.manage.filter(
             (
-                Q(id=data.get("keyword",None)) |
                 Q(reservation__reference=data.get("keyword",None)) |
                 Q(reservation__first_name__icontains=data.get("keyword",None)) |
                 Q(reservation__last_name__icontains=data.get("keyword",None)) |

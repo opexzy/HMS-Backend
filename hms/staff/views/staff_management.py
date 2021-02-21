@@ -169,3 +169,27 @@ def update_staff(request):
             return Response(response_maker(response_type='error',message='Request not understood'),status=HTTP_400_BAD_REQUEST)
     except StaffModel.DoesNotExist:
         return Response(response_maker(response_type='error',message='Request not understood'),status=HTTP_400_BAD_REQUEST)
+
+"""
+    Update staff password
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+@use_permission(CAN_EDIT_STAFF) #Only staff that can view a new staff
+def update_password(request): 
+    #Copy dict data
+    data = dict(request._POST)
+    try:
+        staff = StaffModel.objects.get(pk=data.get("id",None))
+        try:
+            if (len(data.get("password")) >= 6) and (data.get("password") == data.get("password_verify")):
+                staff.auth.set_password(data.get("password"))
+                staff.auth.save()
+                #TODO: Send mail informing staff about new profile updates
+                return Response(response_maker(response_type='success',message='Staff Password updated successfully'),status=HTTP_200_OK)
+            else:
+                return Response(response_maker(response_type='error',message='Password must be 6 characters or more and must match'),status=HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response(response_maker(response_type='error',message='Request not understood'),status=HTTP_400_BAD_REQUEST)
+    except StaffModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message='Request not understood'),status=HTTP_400_BAD_REQUEST)
