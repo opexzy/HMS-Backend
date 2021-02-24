@@ -24,5 +24,6 @@ urlpatterns = [
     path('bar/',include(('bar.urls','bar'), namespace='bar')),
     path('coupon/',include(('coupon.urls','bar'), namespace='coupon')),
     path('option/',include(('options.urls','option'), namespace='option')),
-    #path('customer/',include(('customer.urls','customer'), namespace='customer')),
+    path('vendor/',include(('vendor.urls','vendor'), namespace='vendor')),
+    path('report/',include(('report.urls','report'), namespace='report')),
 ]

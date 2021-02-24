@@ -3,15 +3,16 @@
 """
 
 from rest_framework import serializers
-from reservation.models import PaymentModel
-from .vendor import VendorSerializer
+from vendor.models import VendorPaymentModel
+from .supply_history import SupplySerializer
 
 class VendorPaymentSerializer(serializers.ModelSerializer):
     
     posted_by = serializers.SerializerMethodField("get_posted_by")
+    supply = SupplySerializer()
 
     class Meta:
-        model = PaymentModel
+        model = VendorPaymentModel()
         fields = [
             'id', 
             'supply', 

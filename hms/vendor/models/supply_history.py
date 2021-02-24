@@ -39,6 +39,8 @@ class SupplyModel(models.Model):
         PAID = "paid"
         UNPAID = "unpaid"
 
+        options = [PAID, UNPAID]
+
     class Meta:
         db_table = "hms_supply"
     

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 12, 2021 at 02:20 PM
+-- Generation Time: Feb 24, 2021 at 04:07 PM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.4
 
@@ -154,7 +154,31 @@ INSERT INTO `auth_permission` (`id`, `name`, `content_type_id`, `codename`) VALU
 (77, 'Can add payment model', 20, 'add_paymentmodel'),
 (78, 'Can change payment model', 20, 'change_paymentmodel'),
 (79, 'Can delete payment model', 20, 'delete_paymentmodel'),
-(80, 'Can view payment model', 20, 'view_paymentmodel');
+(80, 'Can view payment model', 20, 'view_paymentmodel'),
+(81, 'Can add order model', 21, 'add_ordermodel'),
+(82, 'Can change order model', 21, 'change_ordermodel'),
+(83, 'Can delete order model', 21, 'delete_ordermodel'),
+(84, 'Can view order model', 21, 'view_ordermodel'),
+(85, 'Can add coupon model', 22, 'add_couponmodel'),
+(86, 'Can change coupon model', 22, 'change_couponmodel'),
+(87, 'Can delete coupon model', 22, 'delete_couponmodel'),
+(88, 'Can view coupon model', 22, 'view_couponmodel'),
+(89, 'Can add supply model', 23, 'add_supplymodel'),
+(90, 'Can change supply model', 23, 'change_supplymodel'),
+(91, 'Can delete supply model', 23, 'delete_supplymodel'),
+(92, 'Can view supply model', 23, 'view_supplymodel'),
+(93, 'Can add vendor model', 24, 'add_vendormodel'),
+(94, 'Can change vendor model', 24, 'change_vendormodel'),
+(95, 'Can delete vendor model', 24, 'delete_vendormodel'),
+(96, 'Can view vendor model', 24, 'view_vendormodel'),
+(97, 'Can add vendor payment model', 25, 'add_vendorpaymentmodel'),
+(98, 'Can change vendor payment model', 25, 'change_vendorpaymentmodel'),
+(99, 'Can delete vendor payment model', 25, 'delete_vendorpaymentmodel'),
+(100, 'Can view vendor payment model', 25, 'view_vendorpaymentmodel'),
+(101, 'Can add option model', 26, 'add_optionmodel'),
+(102, 'Can change option model', 26, 'change_optionmodel'),
+(103, 'Can delete option model', 26, 'delete_optionmodel'),
+(104, 'Can view option model', 26, 'view_optionmodel');
 
 -- --------------------------------------------------------
 
@@ -198,10 +222,13 @@ INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES
 (16, 'bar', 'drinkmodel'),
 (17, 'bar', 'drinkordermodel'),
 (4, 'contenttypes', 'contenttype'),
+(22, 'coupon', 'couponmodel'),
 (8, 'hms_auth', 'authmodel'),
 (9, 'hms_auth', 'authtokenmodel'),
 (18, 'kitchen', 'foodmodel'),
 (19, 'kitchen', 'foodordermodel'),
+(26, 'options', 'optionmodel'),
+(21, 'reservation', 'ordermodel'),
 (20, 'reservation', 'paymentmodel'),
 (13, 'reservation', 'reservationmodel'),
 (15, 'room', 'bookingrecordmodel'),
@@ -209,7 +236,10 @@ INSERT INTO `django_content_type` (`id`, `app_label`, `model`) VALUES
 (5, 'sessions', 'session'),
 (10, 'staff', 'permissionmodel'),
 (11, 'staff', 'staffmodel'),
-(12, 'staff', 'staffpermissionmodel');
+(12, 'staff', 'staffpermissionmodel'),
+(23, 'vendor', 'supplymodel'),
+(24, 'vendor', 'vendormodel'),
+(25, 'vendor', 'vendorpaymentmodel');
 
 -- --------------------------------------------------------
 
@@ -283,7 +313,46 @@ INSERT INTO `django_migrations` (`id`, `app`, `name`, `applied`) VALUES
 (52, 'hms_auth', '0016_auto_20210211_2255', '2021-02-11 21:56:08.490464'),
 (53, 'kitchen', '0003_auto_20210211_2255', '2021-02-11 21:56:10.795386'),
 (54, 'hms_auth', '0017_auto_20210212_0031', '2021-02-11 23:32:05.747432'),
-(55, 'reservation', '0005_paymentmodel', '2021-02-11 23:32:06.202384');
+(55, 'reservation', '0005_paymentmodel', '2021-02-11 23:32:06.202384'),
+(56, 'reservation', '0006_auto_20210216_0814', '2021-02-16 07:14:49.205517'),
+(57, 'bar', '0004_drinkordermodel_payment', '2021-02-16 07:14:51.790490'),
+(58, 'hms_auth', '0018_auto_20210216_0814', '2021-02-16 07:14:51.898595'),
+(59, 'kitchen', '0004_foodordermodel_payment', '2021-02-16 07:14:54.072635'),
+(60, 'room', '0006_bookingrecordmodel_booked_by', '2021-02-16 07:14:56.170040'),
+(61, 'hms_auth', '0019_auto_20210216_1212', '2021-02-16 11:12:14.470713'),
+(62, 'reservation', '0007_auto_20210216_1212', '2021-02-16 11:12:17.957525'),
+(63, 'room', '0007_bookingrecordmodel_payment', '2021-02-16 11:12:23.140837'),
+(64, 'reservation', '0008_auto_20210218_1335', '2021-02-18 12:35:49.055622'),
+(65, 'bar', '0005_drinkordermodel_order', '2021-02-18 12:35:53.320161'),
+(66, 'hms_auth', '0020_auto_20210218_1335', '2021-02-18 12:35:53.809685'),
+(67, 'kitchen', '0005_foodordermodel_order', '2021-02-18 12:36:02.161021'),
+(68, 'hms_auth', '0021_auto_20210218_1420', '2021-02-18 13:23:39.905907'),
+(69, 'hms_auth', '0022_auto_20210218_1421', '2021-02-18 13:23:40.026317'),
+(70, 'reservation', '0009_ordermodel_order_ref', '2021-02-18 13:23:41.500848'),
+(71, 'coupon', '0001_initial', '2021-02-19 09:35:41.329740'),
+(72, 'hms_auth', '0023_auto_20210219_1035', '2021-02-19 09:35:43.599503'),
+(73, 'coupon', '0002_auto_20210219_1101', '2021-02-19 10:01:25.250134'),
+(74, 'hms_auth', '0024_auto_20210219_1101', '2021-02-19 10:01:25.410909'),
+(75, 'coupon', '0003_couponmodel_status', '2021-02-19 10:36:53.232633'),
+(76, 'hms_auth', '0025_auto_20210219_1136', '2021-02-19 10:36:53.431076'),
+(77, 'hms_auth', '0026_auto_20210219_1949', '2021-02-19 18:49:39.881889'),
+(78, 'vendor', '0001_initial', '2021-02-19 18:49:44.726263'),
+(79, 'hms_auth', '0027_auto_20210219_2007', '2021-02-19 19:07:17.875169'),
+(80, 'vendor', '0002_auto_20210219_2007', '2021-02-19 19:07:20.240468'),
+(88, 'options', '0001_initial', '2021-02-20 12:53:20.344349'),
+(89, 'options', '0002_auto_20210220_1307', '2021-02-20 12:53:21.365932'),
+(90, 'bar', '0006_drinkmodel_group', '2021-02-20 12:53:27.137738'),
+(91, 'hms_auth', '0028_auto_20210220_0756', '2021-02-20 12:53:27.238982'),
+(92, 'hms_auth', '0029_auto_20210220_1307', '2021-02-20 12:53:27.336897'),
+(93, 'hms_auth', '0030_auto_20210220_1339', '2021-02-20 12:53:27.473107'),
+(94, 'hms_auth', '0031_auto_20210220_1342', '2021-02-20 12:53:27.755087'),
+(95, 'hms_auth', '0032_auto_20210220_1343', '2021-02-20 12:53:28.135388'),
+(96, 'hms_auth', '0033_auto_20210220_1345', '2021-02-20 12:53:28.346757'),
+(97, 'hms_auth', '0034_auto_20210220_1346', '2021-02-20 12:53:28.496915'),
+(98, 'hms_auth', '0035_auto_20210220_1352', '2021-02-20 12:53:28.654585'),
+(99, 'kitchen', '0006_foodmodel_group', '2021-02-20 12:53:31.449262'),
+(100, 'hms_auth', '0036_auto_20210224_1205', '2021-02-24 11:05:09.072018'),
+(101, 'reservation', '0010_reservationmodel_override_by', '2021-02-24 11:05:11.162320');
 
 -- --------------------------------------------------------
 
@@ -318,9 +387,11 @@ CREATE TABLE `hms_auth` (
 --
 
 INSERT INTO `hms_auth` (`id`, `email`, `password`, `is_staff`, `date_created`, `last_login`, `is_active`) VALUES
-(1, 'opeyemiakosile@gmail.com', 'pbkdf2_sha256$216000$2dWIYNrp8sfC$S6d5NiNdpCOUVXPt4SefUbGge3Frh/boCoDPxMgtxYY=', 1, '2021-02-05 03:05:16.139000', '2021-02-05 03:05:16.139000', 1),
-(3, 'sam@gmail.com', 'pbkdf2_sha256$216000$hZK1fA1bDINi$PolNEKMHApfQ+Ywy8Eiqj6U843NEJ3VSjL4NUf+0ArU=', 1, '2021-02-05 19:23:29.770345', '2021-02-05 19:23:29.770345', 1),
-(4, 'samloco@gmail.com', 'pbkdf2_sha256$216000$SQnl4gsi21VC$8dTQGsN6Ng+fHgnQv+QbfE4ZBCg8S0TSHwi+FHEXaWk=', 1, '2021-02-12 13:02:19.297572', '2021-02-12 13:02:19.297572', 1);
+(1, 'opeyemiakosile@gmail.com', 'pbkdf2_sha256$216000$o1XJStCJm3Qj$dEKnwG8V4b2d7N1qGBGNECw9DJUe7rtllXUvAtAAVgk=', 1, '2021-02-05 03:05:16.139000', '2021-02-14 08:45:28.615932', 1),
+(3, 'sam@gmail.com', 'pbkdf2_sha256$216000$jQDpxiGYKVcB$3/pVrNlpxDJJTAnd2fSqGMtNDf56V5hoLpYITSlrACQ=', 1, '2021-02-05 19:23:29.770345', '2021-02-19 21:34:00.908879', 1),
+(4, 'samloco@gmail.com', 'pbkdf2_sha256$216000$SQnl4gsi21VC$8dTQGsN6Ng+fHgnQv+QbfE4ZBCg8S0TSHwi+FHEXaWk=', 1, '2021-02-12 13:02:19.297572', '2021-02-12 13:02:19.297572', 1),
+(5, 'opeyemi@gmail.com', 'pbkdf2_sha256$216000$05Sc5TT3D0we$jyCYKVjxVbEcjQWyzkELIV+1CRrfea/W8uYqqJqeGEU=', 1, '2021-02-15 06:41:12.848483', '2021-02-15 06:41:12.848483', 1),
+(6, 'rotman@gmail.com', 'pbkdf2_sha256$216000$lA9cne3edKUQ$Z2gmGB/wBLMxic8ed5QeAzRm1MIMwAxkMo4oP3yQ7hw=', 1, '2021-02-15 07:30:24.956751', '2021-02-15 07:30:24.956751', 1);
 
 -- --------------------------------------------------------
 
@@ -340,8 +411,9 @@ CREATE TABLE `hms_auth_token` (
 --
 
 INSERT INTO `hms_auth_token` (`key`, `created`, `expires`, `user_id`) VALUES
-('3a1f30c256bebe7fd142d738ae496ac099307ee1', '2021-02-12 13:12:15.580586', '2021-02-12 13:33:34.453119', 1),
-('77c5bb6eba3842991ebbc256a88d28255c78dfaf', '2021-02-12 13:08:28.669213', '2021-02-12 13:23:31.188880', 4);
+('13f24b3e2f5f1b01b952a0b7f4290afadacb707b', '2021-02-24 11:11:27.512693', '2021-02-24 15:22:10.419847', 1),
+('77c5bb6eba3842991ebbc256a88d28255c78dfaf', '2021-02-12 13:08:28.669213', '2021-02-12 13:23:31.188880', 4),
+('a5aa9ed8726c63c61dcc23e685b8819a00d7b618', '2021-02-19 07:10:31.606407', '2021-02-19 07:25:59.879893', 3);
 
 -- --------------------------------------------------------
 
@@ -358,15 +430,49 @@ CREATE TABLE `hms_booking_record` (
   `check_out` date NOT NULL,
   `reservation_id` bigint(20) NOT NULL,
   `room_id` bigint(20) NOT NULL,
-  `status` varchar(15) NOT NULL
+  `status` varchar(15) NOT NULL,
+  `booked_by_id` int(11) DEFAULT NULL,
+  `payment_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `hms_booking_record`
 --
 
-INSERT INTO `hms_booking_record` (`timestamp`, `id`, `amount`, `quantity`, `check_in`, `check_out`, `reservation_id`, `room_id`, `status`) VALUES
-('2021-02-09 12:33:01.063051', 1, '29000.00', 1, '2021-02-09', '2021-02-11', 2, 2, 'active');
+INSERT INTO `hms_booking_record` (`timestamp`, `id`, `amount`, `quantity`, `check_in`, `check_out`, `reservation_id`, `room_id`, `status`, `booked_by_id`, `payment_id`) VALUES
+('2021-02-09 12:33:01.063051', 1, '29000.00', 1, '2021-02-09', '2021-02-11', 2, 2, 'active', NULL, NULL),
+('2021-02-16 03:23:30.213415', 2, '24500.00', 1, '2021-02-16', '2021-02-17', 8, 1, 'active', NULL, NULL),
+('2021-02-16 09:50:36.854514', 3, '60000.00', 2, '2021-02-16', '2021-02-21', 10, 3, 'active', NULL, NULL),
+('2021-02-18 23:03:38.107273', 4, '58000.00', 1, '2021-02-18', '2021-02-22', 13, 2, 'canceled', 1, 15),
+('2021-02-18 23:02:10.469563', 5, '58000.00', 1, '2021-02-18', '2021-02-22', 14, 2, 'checked_out', 1, 16),
+('2021-02-18 22:59:22.139653', 6, '58000.00', 1, '2021-02-18', '2021-02-22', 15, 2, 'canceled', 1, 17),
+('2021-02-18 22:59:00.825177', 7, '58000.00', 1, '2021-02-18', '2021-02-22', 16, 2, 'checked_out', 1, 18),
+('2021-02-18 23:56:23.629004', 8, '24500.00', 1, '2021-02-19', '2021-02-20', 17, 1, 'canceled', 1, 27),
+('2021-02-19 22:07:57.203273', 9, '24500.00', 1, '2021-02-19', '2021-02-20', 20, 1, 'checked_in', 1, 32);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_coupon`
+--
+
+CREATE TABLE `hms_coupon` (
+  `id` bigint(20) NOT NULL,
+  `code` varchar(14) NOT NULL,
+  `discount` decimal(5,2) NOT NULL,
+  `reservation_id` bigint(20) DEFAULT NULL,
+  `date_created` datetime(6) NOT NULL,
+  `date_used` datetime(6) DEFAULT NULL,
+  `status` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_coupon`
+--
+
+INSERT INTO `hms_coupon` (`id`, `code`, `discount`, `reservation_id`, `date_created`, `date_used`, `status`) VALUES
+(3, 'B0DG9MACG1SVEN', '12.00', 20, '2021-02-19 11:05:26.768575', '2021-02-19 13:41:14.088617', 'used'),
+(4, '66KYKWD9NZI0ZN', '9.00', 14, '2021-02-19 14:23:57.194118', '2021-02-19 22:03:13.172101', 'used');
 
 -- --------------------------------------------------------
 
@@ -380,15 +486,17 @@ CREATE TABLE `hms_drink` (
   `description` varchar(255) NOT NULL,
   `price` decimal(20,2) NOT NULL,
   `metric` varchar(255) NOT NULL,
-  `available` int(11) NOT NULL
+  `available` int(11) NOT NULL,
+  `group_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `hms_drink`
 --
 
-INSERT INTO `hms_drink` (`id`, `name`, `description`, `price`, `metric`, `available`) VALUES
-(1, 'Mocha Edited', 'A Bottle of Mocha Drink', '6550.00', 'bottle', 6);
+INSERT INTO `hms_drink` (`id`, `name`, `description`, `price`, `metric`, `available`, `group_id`) VALUES
+(1, 'Mocha Edited', 'A Bottle of Mocha Drink', '6550.00', 'bottle', 0, NULL),
+(2, 'Just a Wine ', 'Just a Wine ', '16500.00', 'bottle', 45, 6);
 
 -- --------------------------------------------------------
 
@@ -405,19 +513,34 @@ CREATE TABLE `hms_drink_order` (
   `drink_id` bigint(20) NOT NULL,
   `registered_by_id` int(11) DEFAULT NULL,
   `reservation_id` bigint(20) NOT NULL,
-  `completed_by_id` int(11) DEFAULT NULL
+  `completed_by_id` int(11) DEFAULT NULL,
+  `payment_id` bigint(20) DEFAULT NULL,
+  `order_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `hms_drink_order`
 --
 
-INSERT INTO `hms_drink_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `drink_id`, `registered_by_id`, `reservation_id`, `completed_by_id`) VALUES
-(1, '32750.00', 5, 'completed', '2021-02-10 09:16:45.639015', 1, 1, 2, NULL),
-(2, '32750.00', 5, 'completed', '2021-02-11 21:13:04.266443', 1, 1, 1, NULL),
-(3, '45850.00', 7, 'canceled', '2021-02-11 22:35:57.653942', 1, 1, 2, 1),
-(4, '32750.00', 5, 'canceled', '2021-02-11 22:48:26.839907', 1, 1, 1, 1),
-(5, '6550.00', 1, 'pending', '2021-02-11 22:59:08.965789', 1, 1, 1, NULL);
+INSERT INTO `hms_drink_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `drink_id`, `registered_by_id`, `reservation_id`, `completed_by_id`, `payment_id`, `order_id`) VALUES
+(1, '32750.00', 5, 'completed', '2021-02-10 09:16:45.639015', 1, 1, 2, NULL, NULL, NULL),
+(2, '32750.00', 5, 'completed', '2021-02-11 21:13:04.266443', 1, 1, 1, NULL, NULL, NULL),
+(3, '45850.00', 7, 'canceled', '2021-02-11 22:35:57.653942', 1, 1, 2, 1, NULL, NULL),
+(4, '32750.00', 5, 'canceled', '2021-02-11 22:48:26.839907', 1, 1, 1, 1, NULL, NULL),
+(5, '6550.00', 1, 'pending', '2021-02-11 22:59:08.965789', 1, 1, 1, NULL, NULL, NULL),
+(6, '13100.00', 2, 'canceled', '2021-02-17 09:56:34.714398', 1, 1, 3, 1, NULL, NULL),
+(7, '13100.00', 2, 'pending', '2021-02-18 13:59:08.002556', 1, 1, 13, NULL, 22, 1),
+(9, '6550.00', 1, 'pending', '2021-02-18 15:34:16.029672', 1, 1, 14, NULL, 24, 3),
+(10, '6550.00', 1, 'pending', '2021-02-18 15:37:17.846658', 1, 1, 15, NULL, 25, 4),
+(11, '6550.00', 1, 'pending', '2021-02-18 16:00:32.825125', 1, 1, 15, NULL, 26, 5),
+(12, '6550.00', 1, 'pending', '2021-02-19 00:24:12.669394', 1, 1, 14, NULL, 30, 6),
+(13, '82500.00', 5, 'pending', '2021-02-20 17:26:35.761086', 2, 1, 14, NULL, 37, 8),
+(14, '16500.00', 1, 'pending', '2021-02-20 17:46:01.964163', 2, 1, 14, NULL, 38, 9),
+(15, '16500.00', 1, 'pending', '2021-02-20 18:11:45.583048', 2, 1, 14, NULL, 39, 10),
+(16, '16500.00', 1, 'completed', '2021-02-20 18:22:24.890960', 2, 1, 14, 1, 40, 11),
+(17, '16500.00', 1, 'completed', '2021-02-20 18:21:56.715736', 2, 1, 14, 1, NULL, 15),
+(18, '16500.00', 1, 'completed', '2021-02-20 18:21:46.108025', 2, 1, 14, 1, NULL, 16),
+(19, '16500.00', 1, 'pending', '2021-02-23 11:31:03.730151', 2, 1, 14, NULL, 46, 19);
 
 -- --------------------------------------------------------
 
@@ -431,16 +554,18 @@ CREATE TABLE `hms_food` (
   `description` varchar(255) NOT NULL,
   `price` decimal(20,2) NOT NULL,
   `metric` varchar(255) NOT NULL,
-  `available` int(11) NOT NULL
+  `available` int(11) NOT NULL,
+  `group_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `hms_food`
 --
 
-INSERT INTO `hms_food` (`id`, `name`, `description`, `price`, `metric`, `available`) VALUES
-(1, 'Fried Rice Edited', 'Fried rice and Chicken', '1500.00', 'plate', 42),
-(2, 'Jollof Rice', 'Jollof rice and Chicken', '1200.00', 'plate', 44);
+INSERT INTO `hms_food` (`id`, `name`, `description`, `price`, `metric`, `available`, `group_id`) VALUES
+(1, 'Fried Rice Edited', 'Fried rice and Chicken', '1500.00', 'plate', 17, 2),
+(2, 'Jollof Rice', 'Jollof rice and Chicken', '1200.00', 'plate', 29, NULL),
+(3, 'Just A Rice', 'Just A Rice', '2000.00', 'plate', 1500, 2);
 
 -- --------------------------------------------------------
 
@@ -457,18 +582,101 @@ CREATE TABLE `hms_food_order` (
   `food_id` bigint(20) NOT NULL,
   `registered_by_id` int(11) DEFAULT NULL,
   `reservation_id` bigint(20) NOT NULL,
-  `completed_by_id` int(11) DEFAULT NULL
+  `completed_by_id` int(11) DEFAULT NULL,
+  `payment_id` bigint(20) DEFAULT NULL,
+  `order_id` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `hms_food_order`
 --
 
-INSERT INTO `hms_food_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `food_id`, `registered_by_id`, `reservation_id`, `completed_by_id`) VALUES
-(3, '3000.00', 2, 'completed', '2021-02-09 22:44:47.954503', 1, 1, 2, NULL),
-(5, '16500.00', 11, 'canceled', '2021-02-11 21:30:30.430389', 1, 1, 1, NULL),
-(6, '15000.00', 10, 'completed', '2021-02-11 22:43:16.336172', 1, 1, 2, 1),
-(7, '12000.00', 10, 'completed', '2021-02-11 22:41:08.573791', 2, 1, 2, 1);
+INSERT INTO `hms_food_order` (`id`, `amount`, `quantity`, `status`, `timestamp`, `food_id`, `registered_by_id`, `reservation_id`, `completed_by_id`, `payment_id`, `order_id`) VALUES
+(3, '3000.00', 2, 'completed', '2021-02-09 22:44:47.954503', 1, 1, 2, NULL, NULL, NULL),
+(5, '16500.00', 11, 'canceled', '2021-02-11 21:30:30.430389', 1, 1, 1, NULL, NULL, NULL),
+(6, '15000.00', 10, 'completed', '2021-02-11 22:43:16.336172', 1, 1, 2, 1, NULL, NULL),
+(7, '12000.00', 10, 'completed', '2021-02-11 22:41:08.573791', 2, 1, 2, 1, NULL, NULL),
+(8, '6000.00', 4, 'completed', '2021-02-17 09:05:39.096733', 1, 1, 2, 1, 9, NULL),
+(9, '14400.00', 12, 'pending', '2021-02-17 08:56:12.105045', 2, 1, 2, NULL, 9, NULL),
+(10, '3000.00', 2, 'pending', '2021-02-17 09:09:44.512325', 1, 1, 3, NULL, NULL, NULL),
+(11, '7500.00', 5, 'canceled', '2021-02-17 10:54:40.898838', 1, 1, 2, 1, 10, NULL),
+(12, '3000.00', 2, 'pending', '2021-02-18 13:59:07.961860', 1, 1, 13, NULL, 22, 1),
+(14, '3000.00', 2, 'pending', '2021-02-18 15:34:15.779016', 1, 1, 14, NULL, 24, 3),
+(15, '1500.00', 1, 'pending', '2021-02-18 15:37:18.100944', 1, 1, 15, NULL, 25, 4),
+(16, '3000.00', 2, 'pending', '2021-02-18 16:00:32.806184', 1, 1, 15, NULL, 26, 5),
+(17, '3000.00', 2, 'pending', '2021-02-19 00:24:12.253811', 1, 1, 14, NULL, 30, 6),
+(18, '4500.00', 3, 'pending', '2021-02-19 22:28:25.479163', 1, 1, 14, NULL, 36, 7),
+(19, '3600.00', 3, 'pending', '2021-02-19 22:28:26.121011', 2, 1, 14, NULL, 36, 7),
+(20, '3000.00', 2, 'pending', '2021-02-20 18:14:50.888596', 1, 1, 14, NULL, 41, 12),
+(21, '1500.00', 1, 'pending', '2021-02-20 18:17:56.996967', 1, 1, 14, NULL, 42, 13),
+(22, '2000.00', 1, 'canceled', '2021-02-20 18:25:48.040983', 3, 1, 14, 1, 43, 14),
+(23, '1500.00', 1, 'completed', '2021-02-20 18:23:02.869922', 1, 1, 14, 1, NULL, 16),
+(24, '1500.00', 1, 'completed', '2021-02-24 15:01:28.542958', 1, 1, 14, 1, 44, 17),
+(25, '1500.00', 1, 'completed', '2021-02-23 11:29:48.526652', 1, 1, 14, 1, 45, 18),
+(26, '1500.00', 1, 'completed', '2021-02-24 12:16:57.696768', 1, 1, 15, 1, 47, 20);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_options`
+--
+
+CREATE TABLE `hms_options` (
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `value` longtext NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_options`
+--
+
+INSERT INTO `hms_options` (`id`, `name`, `value`) VALUES
+(1, 'food', 'Tuber'),
+(2, 'food', 'Rice'),
+(3, 'food', 'DAvid'),
+(4, 'drink', 'Beer'),
+(5, 'drink', 'Wine'),
+(6, 'drink', 'Beverages'),
+(7, 'drink', 'Citrus');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_order`
+--
+
+CREATE TABLE `hms_order` (
+  `id` bigint(20) NOT NULL,
+  `amount` decimal(20,2) NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
+  `order_ref` varchar(8) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_order`
+--
+
+INSERT INTO `hms_order` (`id`, `amount`, `timestamp`, `order_ref`) VALUES
+(1, '16100.00', '2021-02-18 13:59:07.959866', 'XC1024'),
+(3, '9550.00', '2021-02-18 15:34:15.771039', '9H1025'),
+(4, '8050.00', '2021-02-18 15:37:17.837682', 'FT1026'),
+(5, '9550.00', '2021-02-18 16:00:32.749287', 'E81027'),
+(6, '9550.00', '2021-02-19 00:24:12.179924', 'TX1028'),
+(7, '-900.00', '2021-02-19 22:28:25.398379', '3C1029'),
+(8, '82500.00', '2021-02-20 17:26:35.577342', 'WA1030'),
+(9, '16500.00', '2021-02-20 17:46:01.840338', '3I1031'),
+(10, '16500.00', '2021-02-20 18:11:45.477057', 'XT1032'),
+(11, '16500.00', '2021-02-20 18:12:34.575566', 'UD1033'),
+(12, '3000.00', '2021-02-20 18:14:50.883607', 'Z61034'),
+(13, '1500.00', '2021-02-20 18:17:56.991977', 'JC1035'),
+(14, '2000.00', '2021-02-20 18:20:06.674816', 'HI1036'),
+(15, '16500.00', '2021-02-20 18:20:41.331274', 'D31037'),
+(16, '18000.00', '2021-02-20 18:21:08.125929', 'CQ1038'),
+(17, '1500.00', '2021-02-23 11:26:56.305263', 'TJ1039'),
+(18, '1500.00', '2021-02-23 11:28:26.640632', 'YM1040'),
+(19, '16500.00', '2021-02-23 11:31:03.726160', '2L1041'),
+(20, '1500.00', '2021-02-24 12:14:09.467847', 'NO1042');
 
 -- --------------------------------------------------------
 
@@ -480,23 +688,56 @@ CREATE TABLE `hms_payment` (
   `id` bigint(20) NOT NULL,
   `channel` varchar(25) NOT NULL,
   `amount` decimal(20,2) NOT NULL,
-  `amount_paid` decimal(20,2) NOT NULL,
-  `amount_unpaid` decimal(20,2) NOT NULL,
   `status` varchar(15) NOT NULL,
   `timestamp` datetime(6) NOT NULL,
   `posted_by_id` int(11) DEFAULT NULL,
-  `reservation_id` bigint(20) NOT NULL
+  `reservation_id` bigint(20) NOT NULL,
+  `narration` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `hms_payment`
 --
 
-INSERT INTO `hms_payment` (`id`, `channel`, `amount`, `amount_paid`, `amount_unpaid`, `status`, `timestamp`, `posted_by_id`, `reservation_id`) VALUES
-(5, 'transfer', '50000.00', '50000.00', '70050.00', 'completed', '2021-02-12 01:45:36.323480', 1, 1),
-(6, 'pos', '70050.00', '120050.00', '0.00', 'completed', '2021-02-12 01:46:10.281226', 1, 1),
-(7, 'direct', '58250.00', '58250.00', '33500.00', 'completed', '2021-02-12 01:46:27.496202', 1, 2),
-(8, 'cash', '33500.00', '91750.00', '0.00', 'completed', '2021-02-12 01:47:01.385726', 1, 2);
+INSERT INTO `hms_payment` (`id`, `channel`, `amount`, `status`, `timestamp`, `posted_by_id`, `reservation_id`, `narration`) VALUES
+(5, 'transfer', '50000.00', 'completed', '2021-02-12 01:45:36.323480', 1, 1, ''),
+(6, 'pos', '70050.00', 'completed', '2021-02-12 01:46:10.281226', 1, 1, ''),
+(7, 'direct', '58250.00', 'completed', '2021-02-12 01:46:27.496202', 1, 2, ''),
+(8, 'cash', '33500.00', 'completed', '2021-02-12 01:47:01.385726', 1, 2, ''),
+(9, 'cash', '20400.00', 'completed', '2021-02-17 08:56:11.113995', 1, 2, 'Cash collected by: Opeyemi Akosile'),
+(10, 'pos', '7500.00', 'completed', '2021-02-17 10:52:30.416302', 1, 2, 'Payment made with POS using debit/credit card'),
+(11, 'direct', '7500.00', 'reversed', '2021-02-17 10:54:41.101357', 1, 2, 'Payment reversal for food order with id: 11'),
+(13, 'transfer', '10000.00', 'completed', '2021-02-17 12:26:41.090982', 1, 2, 'Customer made bank transfer with reference id/NO: uyhsyu73881738kd'),
+(14, 'pos', '60000.00', 'completed', '2021-02-17 14:44:23.438500', 1, 3, 'Payment made with POS using debit/credit card'),
+(15, 'transfer', '58000.00', 'completed', '2021-02-18 06:59:44.255416', 1, 13, 'Customer made bank transfer with reference id/NO: Thdjuejj7948939892'),
+(16, 'transfer', '58000.00', 'completed', '2021-02-18 07:02:17.060900', 1, 14, 'Customer made bank transfer with reference id/NO: Thdjuejj7948939892'),
+(17, 'transfer', '58000.00', 'completed', '2021-02-18 07:03:39.824182', 1, 15, 'Customer made bank transfer with reference id/NO: Thdjuejj7948939892'),
+(18, 'transfer', '58000.00', 'completed', '2021-02-18 07:04:13.065072', 1, 16, 'Customer made bank transfer with reference id/NO: Thdjuejj7948939892'),
+(22, 'pos', '16100.00', 'completed', '2021-02-18 13:59:07.879636', 1, 13, 'Payment made with POS using debit/credit card'),
+(24, 'cash', '9550.00', 'completed', '2021-02-18 15:34:15.733761', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(25, 'cash', '8050.00', 'completed', '2021-02-18 15:37:17.820422', 1, 15, 'Cash collected by: Opeyemi Akosile'),
+(26, 'cash', '9550.00', 'completed', '2021-02-18 16:00:32.549484', 1, 15, 'Cash collected by: Opeyemi Akosile'),
+(27, 'transfer', '24500.00', 'completed', '2021-02-18 23:55:27.942860', 1, 17, 'Customer made bank transfer with reference id/NO: UU030394049HJSY'),
+(28, 'direct', '24500.00', 'reversed', '2021-02-19 00:00:10.563317', 1, 17, 'Reversed canceled reservation credit balance'),
+(29, 'direct', '108000.00', 'reversed', '2021-02-19 00:03:35.354750', 1, 13, 'Reversed closed reservation credit balance'),
+(30, 'cash', '9550.00', 'completed', '2021-02-19 00:24:11.993803', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(31, 'transfer', '5000.00', 'completed', '2021-02-19 07:31:30.943742', 1, 20, 'Customer made bank transfer with reference id/NO: '),
+(32, 'cash', '24500.00', 'completed', '2021-02-19 07:31:31.095085', 1, 20, 'Cash collected by: Opeyemi Akosile'),
+(33, '(\'coupon\',)', '2940.00', 'completed', '2021-02-19 13:41:14.677627', 1, 20, 'Coupon payment at 12.00% of total amount spent'),
+(34, 'pos', '25000.00', 'completed', '2021-02-19 21:52:41.316006', 1, 20, 'Payment made with POS using debit/credit card'),
+(35, 'coupon', '6939.00', 'completed', '2021-02-19 22:03:13.552105', 1, 14, 'Coupon payment at 9.00% of total amount spent'),
+(36, 'pos', '-900.00', 'completed', '2021-02-19 22:28:23.783893', 1, 14, 'Payment made with POS using debit/credit card'),
+(37, 'cash', '82500.00', 'completed', '2021-02-20 17:26:34.645518', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(38, 'cash', '16500.00', 'completed', '2021-02-20 17:46:01.465864', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(39, 'cash', '16500.00', 'completed', '2021-02-20 18:11:44.817067', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(40, 'cash', '16500.00', 'completed', '2021-02-20 18:12:34.572734', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(41, 'cash', '3000.00', 'completed', '2021-02-20 18:14:50.866124', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(42, 'cash', '1500.00', 'completed', '2021-02-20 18:17:56.819811', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(43, 'cash', '2000.00', 'completed', '2021-02-20 18:20:06.628930', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(44, 'cash', '1500.00', 'completed', '2021-02-23 11:26:55.386640', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(45, 'cash', '1500.00', 'completed', '2021-02-23 11:28:26.625665', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(46, 'cash', '16500.00', 'completed', '2021-02-23 11:31:03.675253', 1, 14, 'Cash collected by: Opeyemi Akosile'),
+(47, 'cash', '1500.00', 'completed', '2021-02-24 12:14:09.388060', 1, 15, 'Cash collected by: Opeyemi Akosile');
 
 -- --------------------------------------------------------
 
@@ -542,7 +783,15 @@ INSERT INTO `hms_permission` (`id`, `display_name`, `name`, `category`) VALUES
 (24, 'Make Payment', 'can_make_payment', 'basic'),
 (25, 'Reverse Payment', 'can_reverse_payment', 'management'),
 (26, 'View Payment History', 'can_view_payment_history', 'basic'),
-(27, 'Print Invoice', 'can_print_invoice', 'basic');
+(27, 'Print Invoice', 'can_print_invoice', 'basic'),
+(28, 'Cancel Reservation', 'can_cancel_reservation', 'management'),
+(29, 'Cancel Order', 'can_cancel_order', 'management'),
+(31, 'Update Bookings', 'can_update_bookings', 'management'),
+(32, 'Close Reservation', 'can_close_reservation', 'management'),
+(33, 'Add Coupon', 'can_add_coupon', 'management'),
+(34, 'View Coupon', 'can_view_coupon', 'management'),
+(35, 'Override Reservation', 'can_override_reservation', 'management'),
+(36, 'Vendor Management', 'can_manage_vendor', 'management');
 
 -- --------------------------------------------------------
 
@@ -553,24 +802,38 @@ INSERT INTO `hms_permission` (`id`, `display_name`, `name`, `category`) VALUES
 CREATE TABLE `hms_reservation` (
   `id` bigint(20) NOT NULL,
   `reference` varchar(12) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
   `phone_number` varchar(15) NOT NULL,
   `status` varchar(15) NOT NULL,
   `credit_balance` decimal(20,2) NOT NULL,
   `amount_spent` decimal(20,2) NOT NULL,
   `timestamp` datetime(6) NOT NULL,
   `created_by_id` int(11) DEFAULT NULL,
-  `gender` varchar(15) NOT NULL
+  `gender` varchar(15) DEFAULT NULL,
+  `amount_unpaid` decimal(20,2) NOT NULL,
+  `corporate_name` varchar(255) DEFAULT NULL,
+  `reservation_type` varchar(50) NOT NULL,
+  `override_by_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `hms_reservation`
 --
 
-INSERT INTO `hms_reservation` (`id`, `reference`, `first_name`, `last_name`, `phone_number`, `status`, `credit_balance`, `amount_spent`, `timestamp`, `created_by_id`, `gender`) VALUES
-(1, 'J4SVT8NU0BCT', 'Opeyemi', 'Akosile', '08065546736', 'checked_out', '29950.00', '120050.00', '2021-02-12 01:46:10.346756', 1, 'male'),
-(2, 'KSRELQR4HJ2Y', 'Jerome', 'Coleman', '09065551148', 'checked_out', '16500.00', '91750.00', '2021-02-12 01:47:01.385726', 1, 'male');
+INSERT INTO `hms_reservation` (`id`, `reference`, `first_name`, `last_name`, `phone_number`, `status`, `credit_balance`, `amount_spent`, `timestamp`, `created_by_id`, `gender`, `amount_unpaid`, `corporate_name`, `reservation_type`, `override_by_id`) VALUES
+(1, 'J4SVT8NU0BCT', 'Opeyemi', 'Akosile', '08065546736', 'checked_out', '29950.00', '120050.00', '2021-02-12 01:46:10.346756', 1, 'male', '0.00', NULL, 'individual', NULL),
+(2, 'KSRELQR4HJ2Y', 'Jerome', 'Coleman', '09065551148', 'checked_out', '41500.00', '112150.00', '2021-02-17 12:26:41.217847', 1, 'male', '0.00', NULL, 'individual', NULL),
+(3, 'QRVES84K1XU0', 'Joshua', 'Adebayo', '09073874783', 'checked_out', '57000.00', '3000.00', '2021-02-17 14:44:23.581224', 1, 'male', '0.00', NULL, 'individual', NULL),
+(8, 'OVQLDWFQFYTQ', 'Olaniyi', 'Eunice', '0908763647', 'canceled', '10000.00', '24500.00', '2021-02-16 11:44:17.604701', 1, 'female', '0.00', NULL, 'individual', NULL),
+(9, 'GSLNHMYANQMK', '', '', '09083837642', 'canceled', '150000.00', '0.00', '2021-02-17 14:48:34.263788', 1, '', '0.00', 'Bethsaid Groups', 'corporate', NULL),
+(10, '7FOWJ1U6Q8QO', 'Jason', 'Derulo', '0908378362', 'canceled', '0.00', '60000.00', '2021-02-16 10:55:20.049413', 1, 'female', '0.00', '', 'individual', NULL),
+(13, 'LELCAJSRAVLM', 'Adekunle', 'Johnson', '08056726736', 'closed', '108000.00', '16100.00', '2021-02-19 00:03:35.265976', 1, 'male', '0.00', '', 'individual', NULL),
+(14, 'OJGPEX8HINWZ', 'Adekunle', 'Johnson', '08056726736', 'closed', '6939.00', '266700.00', '2021-02-24 11:49:27.338489', 1, 'male', '32500.00', '', 'individual', 1),
+(15, 'PG7RAUJQLADF', 'Adekunle', 'Johnson', '08056726736', 'active', '108000.00', '19100.00', '2021-02-24 12:14:09.379084', 1, 'male', '0.00', 'White Deck Resort', 'corporate', NULL),
+(16, 'BMDQBTPRZPD3', 'Adekunle', 'Johnson', '08056726736', 'active', '50000.00', '58000.00', '2021-02-18 07:04:13.267593', 1, 'male', '0.00', 'White Deck Resort', 'corporate', NULL),
+(17, 'VO8APTXSWY8I', '', '', '09078378367', 'canceled', '24500.00', '0.00', '2021-02-19 00:00:10.559312', 1, '', '0.00', 'Green White Green', 'corporate', NULL),
+(20, '83LDWWF8VOGX', '', '', '0908978839', 'active', '27940.00', '24500.00', '2021-02-19 21:52:41.546814', 1, 'male', '0.00', 'Just another Group', 'corporate', NULL);
 
 -- --------------------------------------------------------
 
@@ -593,8 +856,10 @@ CREATE TABLE `hms_room` (
 --
 
 INSERT INTO `hms_room` (`id`, `name`, `description`, `price`, `start_no`, `end_no`, `available`) VALUES
-(1, 'Deluxe Room', 'Just another Deluxe Room', '24500.00', 100, 109, 10),
-(2, 'Standard Room', 'Just another Standard Room', '14500.00', 200, 209, 9);
+(1, 'Deluxe Room', 'Just another Deluxe Room', '24500.00', 100, 109, 9),
+(2, 'Standard Room', 'Just another Standard Room', '14500.00', 200, 209, 10),
+(3, 'Testing Room', 'Just testing Room', '6000.00', 100, 105, 6),
+(4, 'Just testing Room', 'Just testing Room', '6700.00', 100, 103, 4);
 
 -- --------------------------------------------------------
 
@@ -620,7 +885,9 @@ CREATE TABLE `hms_staff` (
 INSERT INTO `hms_staff` (`id`, `first_name`, `last_name`, `gender`, `phone_number`, `position`, `avatar`, `auth_id`) VALUES
 (1, 'Opeyemi', 'Akosile', 'male', '08076567677', 'Administrator', '', 1),
 (2, 'Samuel', 'Opeyemi', 'male', '0907383783', 'Account Officer', '', 3),
-(3, 'Sammy', 'Samora', 'male', '09092763737', 'Bar Tender', '', 4);
+(3, 'Sammy', 'Samora', 'male', '09092763737', 'Bar Tender', '', 4),
+(4, 'Samuel', 'Toke', 'female', '09076777675', 'Account Officer', '', 5),
+(5, 'Rotimi', 'Mac', 'male', '0909087783', 'Account Officer', '', 6);
 
 -- --------------------------------------------------------
 
@@ -665,7 +932,80 @@ INSERT INTO `hms_staff_permission` (`id`, `date_asigned`, `permission_id`, `staf
 (23, '2021-02-12 01:15:55.675024', 25, 1),
 (24, '2021-02-12 01:15:55.775324', 24, 1),
 (25, '2021-02-12 01:15:55.813083', 26, 1),
-(26, '2021-02-12 01:15:55.875585', 27, 1);
+(26, '2021-02-12 01:15:55.875585', 27, 1),
+(28, '2021-02-17 09:53:18.760289', 29, 1),
+(29, '2021-02-18 22:46:01.251835', 28, 1),
+(30, '2021-02-18 22:46:01.486877', 31, 1),
+(31, '2021-02-18 23:53:19.456982', 32, 1),
+(32, '2021-02-19 10:29:30.735071', 33, 1),
+(33, '2021-02-19 10:29:30.842965', 34, 1),
+(34, '2021-02-24 11:45:17.407290', 35, 1),
+(35, '2021-02-24 11:45:17.476401', 36, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_supply`
+--
+
+CREATE TABLE `hms_supply` (
+  `id` bigint(20) NOT NULL,
+  `description` varchar(500) NOT NULL,
+  `status` varchar(20) NOT NULL,
+  `amount` decimal(20,2) NOT NULL,
+  `amount_unpaid` decimal(20,2) NOT NULL,
+  `date_created` datetime(6) NOT NULL,
+  `vendor_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_supply`
+--
+
+INSERT INTO `hms_supply` (`id`, `description`, `status`, `amount`, `amount_unpaid`, `date_created`, `vendor_id`) VALUES
+(6, 'Bought 10 crates of Jamesson Drink', 'unpaid', '145000.00', '135000.00', '2021-02-23 10:49:44.333765', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_vendor`
+--
+
+CREATE TABLE `hms_vendor` (
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_vendor`
+--
+
+INSERT INTO `hms_vendor` (`id`, `name`, `address`) VALUES
+(1, 'James Drink', 'No 76, agodi'),
+(2, 'Mama Cap Rice Depot', 'No 7, Ojodu Abiodun Street');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hms_vendor_payment`
+--
+
+CREATE TABLE `hms_vendor_payment` (
+  `id` bigint(20) NOT NULL,
+  `amount` decimal(20,2) NOT NULL,
+  `status` varchar(15) NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
+  `posted_by_id` int(11) DEFAULT NULL,
+  `supply_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hms_vendor_payment`
+--
+
+INSERT INTO `hms_vendor_payment` (`id`, `amount`, `status`, `timestamp`, `posted_by_id`, `supply_id`) VALUES
+(1, '10000.00', 'completed', '2021-02-23 10:49:58.459899', 1, 6);
 
 --
 -- Indexes for dumped tables
@@ -748,14 +1088,25 @@ ALTER TABLE `hms_auth_token`
 ALTER TABLE `hms_booking_record`
   ADD PRIMARY KEY (`id`),
   ADD KEY `hms_booking_record_reservation_id_50bc3b67_fk_hms_reservation_id` (`reservation_id`),
-  ADD KEY `hms_booking_record_room_id_1f99642b_fk_hms_room_id` (`room_id`);
+  ADD KEY `hms_booking_record_room_id_1f99642b_fk_hms_room_id` (`room_id`),
+  ADD KEY `hms_booking_record_booked_by_id_38ddcd7e_fk_hms_staff_id` (`booked_by_id`),
+  ADD KEY `hms_booking_record_payment_id_ee559d26_fk_hms_payment_id` (`payment_id`);
+
+--
+-- Indexes for table `hms_coupon`
+--
+ALTER TABLE `hms_coupon`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`),
+  ADD KEY `hms_coupon_reservation_id_b36e46e2_fk_hms_reservation_id` (`reservation_id`);
 
 --
 -- Indexes for table `hms_drink`
 --
 ALTER TABLE `hms_drink`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `hms_drink_group_id_fada3094_fk_hms_options_id` (`group_id`);
 
 --
 -- Indexes for table `hms_drink_order`
@@ -765,14 +1116,17 @@ ALTER TABLE `hms_drink_order`
   ADD KEY `hms_drink_order_drink_id_a75367a7_fk_hms_drink_id` (`drink_id`),
   ADD KEY `hms_drink_order_reservation_id_641704bb_fk_hms_reservation_id` (`reservation_id`),
   ADD KEY `hms_drink_order_completed_by_id_034048ab_fk_hms_staff_id` (`completed_by_id`),
-  ADD KEY `hms_drink_order_registered_by_id_925d406a_fk_hms_staff_id` (`registered_by_id`);
+  ADD KEY `hms_drink_order_registered_by_id_925d406a_fk_hms_staff_id` (`registered_by_id`),
+  ADD KEY `hms_drink_order_payment_id_78bcb10d_fk_hms_payment_id` (`payment_id`),
+  ADD KEY `hms_drink_order_order_id_afd65f98_fk_hms_order_id` (`order_id`);
 
 --
 -- Indexes for table `hms_food`
 --
 ALTER TABLE `hms_food`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD UNIQUE KEY `name` (`name`),
+  ADD KEY `hms_food_group_id_6295032c_fk_hms_options_id` (`group_id`);
 
 --
 -- Indexes for table `hms_food_order`
@@ -782,7 +1136,22 @@ ALTER TABLE `hms_food_order`
   ADD KEY `hms_food_order_food_id_f4f33934_fk_hms_food_id` (`food_id`),
   ADD KEY `hms_food_order_reservation_id_1abcddc8_fk_hms_reservation_id` (`reservation_id`),
   ADD KEY `hms_food_order_completed_by_id_a1b6dadc_fk_hms_staff_id` (`completed_by_id`),
-  ADD KEY `hms_food_order_registered_by_id_7ec240c7_fk_hms_staff_id` (`registered_by_id`);
+  ADD KEY `hms_food_order_registered_by_id_7ec240c7_fk_hms_staff_id` (`registered_by_id`),
+  ADD KEY `hms_food_order_payment_id_9ce43c23_fk_hms_payment_id` (`payment_id`),
+  ADD KEY `hms_food_order_order_id_35be6ccb_fk_hms_order_id` (`order_id`);
+
+--
+-- Indexes for table `hms_options`
+--
+ALTER TABLE `hms_options`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `hms_order`
+--
+ALTER TABLE `hms_order`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `order_ref` (`order_ref`);
 
 --
 -- Indexes for table `hms_payment`
@@ -804,14 +1173,15 @@ ALTER TABLE `hms_permission`
 ALTER TABLE `hms_reservation`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `hms_reservation_reference_40a5d0eb_uniq` (`reference`),
-  ADD KEY `hms_reservation_created_by_id_9aec3e14_fk_hms_staff_id` (`created_by_id`);
+  ADD KEY `hms_reservation_created_by_id_9aec3e14_fk_hms_staff_id` (`created_by_id`),
+  ADD KEY `hms_reservation_override_by_id_5c56504e_fk_hms_staff_id` (`override_by_id`);
 
 --
 -- Indexes for table `hms_room`
 --
 ALTER TABLE `hms_room`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD UNIQUE KEY `name` (`name`) USING BTREE;
 
 --
 -- Indexes for table `hms_staff`
@@ -827,6 +1197,28 @@ ALTER TABLE `hms_staff_permission`
   ADD PRIMARY KEY (`id`),
   ADD KEY `hms_staff_permission_permission_id_1a868e51_fk_hms_permission_id` (`permission_id`),
   ADD KEY `hms_staff_permission_staff_id_8ee23e72_fk_hms_staff_id` (`staff_id`);
+
+--
+-- Indexes for table `hms_supply`
+--
+ALTER TABLE `hms_supply`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `hms_supply_vendor_id_7dceb2e7_fk_hms_vendor_id` (`vendor_id`);
+
+--
+-- Indexes for table `hms_vendor`
+--
+ALTER TABLE `hms_vendor`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `hms_vendor_payment`
+--
+ALTER TABLE `hms_vendor_payment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `hms_vendor_payment_posted_by_id_f5757f40_fk_hms_staff_id` (`posted_by_id`),
+  ADD KEY `hms_vendor_payment_supply_id_177ba0bb_fk_hms_supply_id` (`supply_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -848,7 +1240,7 @@ ALTER TABLE `auth_group_permissions`
 -- AUTO_INCREMENT for table `auth_permission`
 --
 ALTER TABLE `auth_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT for table `django_admin_log`
@@ -860,85 +1252,121 @@ ALTER TABLE `django_admin_log`
 -- AUTO_INCREMENT for table `django_content_type`
 --
 ALTER TABLE `django_content_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `django_migrations`
 --
 ALTER TABLE `django_migrations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `hms_auth`
 --
 ALTER TABLE `hms_auth`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `hms_booking_record`
 --
 ALTER TABLE `hms_booking_record`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `hms_coupon`
+--
+ALTER TABLE `hms_coupon`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `hms_drink`
 --
 ALTER TABLE `hms_drink`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `hms_drink_order`
 --
 ALTER TABLE `hms_drink_order`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `hms_food`
 --
 ALTER TABLE `hms_food`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `hms_food_order`
 --
 ALTER TABLE `hms_food_order`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `hms_options`
+--
+ALTER TABLE `hms_options`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `hms_order`
+--
+ALTER TABLE `hms_order`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `hms_payment`
 --
 ALTER TABLE `hms_payment`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `hms_permission`
 --
 ALTER TABLE `hms_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `hms_reservation`
 --
 ALTER TABLE `hms_reservation`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `hms_room`
 --
 ALTER TABLE `hms_room`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `hms_staff`
 --
 ALTER TABLE `hms_staff`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `hms_staff_permission`
 --
 ALTER TABLE `hms_staff_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
+-- AUTO_INCREMENT for table `hms_supply`
+--
+ALTER TABLE `hms_supply`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `hms_vendor`
+--
+ALTER TABLE `hms_vendor`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `hms_vendor_payment`
+--
+ALTER TABLE `hms_vendor_payment`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
@@ -980,8 +1408,22 @@ ALTER TABLE `hms_auth_token`
 -- Constraints for table `hms_booking_record`
 --
 ALTER TABLE `hms_booking_record`
+  ADD CONSTRAINT `hms_booking_record_booked_by_id_38ddcd7e_fk_hms_staff_id` FOREIGN KEY (`booked_by_id`) REFERENCES `hms_staff` (`id`),
+  ADD CONSTRAINT `hms_booking_record_payment_id_ee559d26_fk_hms_payment_id` FOREIGN KEY (`payment_id`) REFERENCES `hms_payment` (`id`),
   ADD CONSTRAINT `hms_booking_record_reservation_id_50bc3b67_fk_hms_reservation_id` FOREIGN KEY (`reservation_id`) REFERENCES `hms_reservation` (`id`),
   ADD CONSTRAINT `hms_booking_record_room_id_1f99642b_fk_hms_room_id` FOREIGN KEY (`room_id`) REFERENCES `hms_room` (`id`);
+
+--
+-- Constraints for table `hms_coupon`
+--
+ALTER TABLE `hms_coupon`
+  ADD CONSTRAINT `hms_coupon_reservation_id_b36e46e2_fk_hms_reservation_id` FOREIGN KEY (`reservation_id`) REFERENCES `hms_reservation` (`id`);
+
+--
+-- Constraints for table `hms_drink`
+--
+ALTER TABLE `hms_drink`
+  ADD CONSTRAINT `hms_drink_group_id_fada3094_fk_hms_options_id` FOREIGN KEY (`group_id`) REFERENCES `hms_options` (`id`);
 
 --
 -- Constraints for table `hms_drink_order`
@@ -989,8 +1431,16 @@ ALTER TABLE `hms_booking_record`
 ALTER TABLE `hms_drink_order`
   ADD CONSTRAINT `hms_drink_order_completed_by_id_034048ab_fk_hms_staff_id` FOREIGN KEY (`completed_by_id`) REFERENCES `hms_staff` (`id`),
   ADD CONSTRAINT `hms_drink_order_drink_id_a75367a7_fk_hms_drink_id` FOREIGN KEY (`drink_id`) REFERENCES `hms_drink` (`id`),
+  ADD CONSTRAINT `hms_drink_order_order_id_afd65f98_fk_hms_order_id` FOREIGN KEY (`order_id`) REFERENCES `hms_order` (`id`),
+  ADD CONSTRAINT `hms_drink_order_payment_id_78bcb10d_fk_hms_payment_id` FOREIGN KEY (`payment_id`) REFERENCES `hms_payment` (`id`),
   ADD CONSTRAINT `hms_drink_order_registered_by_id_925d406a_fk_hms_staff_id` FOREIGN KEY (`registered_by_id`) REFERENCES `hms_staff` (`id`),
   ADD CONSTRAINT `hms_drink_order_reservation_id_641704bb_fk_hms_reservation_id` FOREIGN KEY (`reservation_id`) REFERENCES `hms_reservation` (`id`);
+
+--
+-- Constraints for table `hms_food`
+--
+ALTER TABLE `hms_food`
+  ADD CONSTRAINT `hms_food_group_id_6295032c_fk_hms_options_id` FOREIGN KEY (`group_id`) REFERENCES `hms_options` (`id`);
 
 --
 -- Constraints for table `hms_food_order`
@@ -998,6 +1448,8 @@ ALTER TABLE `hms_drink_order`
 ALTER TABLE `hms_food_order`
   ADD CONSTRAINT `hms_food_order_completed_by_id_a1b6dadc_fk_hms_staff_id` FOREIGN KEY (`completed_by_id`) REFERENCES `hms_staff` (`id`),
   ADD CONSTRAINT `hms_food_order_food_id_f4f33934_fk_hms_food_id` FOREIGN KEY (`food_id`) REFERENCES `hms_food` (`id`),
+  ADD CONSTRAINT `hms_food_order_order_id_35be6ccb_fk_hms_order_id` FOREIGN KEY (`order_id`) REFERENCES `hms_order` (`id`),
+  ADD CONSTRAINT `hms_food_order_payment_id_9ce43c23_fk_hms_payment_id` FOREIGN KEY (`payment_id`) REFERENCES `hms_payment` (`id`),
   ADD CONSTRAINT `hms_food_order_registered_by_id_7ec240c7_fk_hms_staff_id` FOREIGN KEY (`registered_by_id`) REFERENCES `hms_staff` (`id`),
   ADD CONSTRAINT `hms_food_order_reservation_id_1abcddc8_fk_hms_reservation_id` FOREIGN KEY (`reservation_id`) REFERENCES `hms_reservation` (`id`);
 
@@ -1012,7 +1464,8 @@ ALTER TABLE `hms_payment`
 -- Constraints for table `hms_reservation`
 --
 ALTER TABLE `hms_reservation`
-  ADD CONSTRAINT `hms_reservation_created_by_id_9aec3e14_fk_hms_staff_id` FOREIGN KEY (`created_by_id`) REFERENCES `hms_staff` (`id`);
+  ADD CONSTRAINT `hms_reservation_created_by_id_9aec3e14_fk_hms_staff_id` FOREIGN KEY (`created_by_id`) REFERENCES `hms_staff` (`id`),
+  ADD CONSTRAINT `hms_reservation_override_by_id_5c56504e_fk_hms_staff_id` FOREIGN KEY (`override_by_id`) REFERENCES `hms_staff` (`id`);
 
 --
 -- Constraints for table `hms_staff`
@@ -1026,6 +1479,19 @@ ALTER TABLE `hms_staff`
 ALTER TABLE `hms_staff_permission`
   ADD CONSTRAINT `hms_staff_permission_permission_id_1a868e51_fk_hms_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `hms_permission` (`id`),
   ADD CONSTRAINT `hms_staff_permission_staff_id_8ee23e72_fk_hms_staff_id` FOREIGN KEY (`staff_id`) REFERENCES `hms_staff` (`id`);
+
+--
+-- Constraints for table `hms_supply`
+--
+ALTER TABLE `hms_supply`
+  ADD CONSTRAINT `hms_supply_vendor_id_7dceb2e7_fk_hms_vendor_id` FOREIGN KEY (`vendor_id`) REFERENCES `hms_vendor` (`id`);
+
+--
+-- Constraints for table `hms_vendor_payment`
+--
+ALTER TABLE `hms_vendor_payment`
+  ADD CONSTRAINT `hms_vendor_payment_posted_by_id_f5757f40_fk_hms_staff_id` FOREIGN KEY (`posted_by_id`) REFERENCES `hms_staff` (`id`),
+  ADD CONSTRAINT `hms_vendor_payment_supply_id_177ba0bb_fk_hms_supply_id` FOREIGN KEY (`supply_id`) REFERENCES `hms_supply` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

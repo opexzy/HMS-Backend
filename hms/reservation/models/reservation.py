@@ -32,6 +32,7 @@ class ReservationModel(models.Model):
     gender = models.CharField(max_length=15, null=True, verbose_name="Gender")
     phone_number = models.CharField(max_length=15, verbose_name="Phone Number")
     created_by = models.ForeignKey(StaffModel, on_delete=models.DO_NOTHING, verbose_name="Created By", related_name="reservation_created_by", null=True)
+    override_by = models.ForeignKey(StaffModel, on_delete=models.DO_NOTHING, verbose_name="Override By", related_name="reservation_override_by", null=True)
     status = models.CharField(max_length=15, verbose_name="Reservation Status")
     credit_balance =  models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Credit Balance")
     amount_spent =  models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Amount Spent")

@@ -8,7 +8,7 @@ from rest_framework.status import (
 )
 from rest_framework.response import Response
 from staff.models import staff
-from staff.permission.list import CAN_CLOSE_RESERVATION
+from staff.permission.list import CAN_CLOSE_RESERVATION, CAN_OVERRIDE_RESERVATION
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
 from staff.permission import use_permission, CAN_MAKE_RESERVATION, CAN_VIEW_RESERVATION, CAN_CANCEL_RESERVATION
@@ -361,3 +361,26 @@ def list_active_reservation(request):
         return Response(response_maker(response_type='error',message='Reservation deos not exist or not active'),status=HTTP_400_BAD_REQUEST)
     except Exception:
         return Response(response_maker(response_type='error',message='Unknown internal error'),status=HTTP_400_BAD_REQUEST)
+
+"""
+    Override Reservation
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept post request
+@use_permission(CAN_OVERRIDE_RESERVATION)
+def override_reservation(request, reference): 
+    try:
+        with transaction.atomic():
+            staff = StaffModel.objects.get(auth=request.user)
+            reservation = ReservationModel.manage.get(reference=reference, status=ReservationModel.Status.ACTIVE)
+            if (reservation.amount_unpaid > 0):
+                reservation.status=ReservationModel.Status.CLOSED
+                reservation.override_by = staff
+                reservation.save() 
+            else:
+                return Response(response_maker(response_type='error',message='There is no need to override a reservation with zero amount unpaid, Use Close instead'),status=HTTP_400_BAD_REQUEST)
+        return Response(response_maker(response_type='success',message='Customer Reservation Canceled Successfully'),status=HTTP_200_OK)
+    except ReservationModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message='Reservation deos not exist or not active'),status=HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)

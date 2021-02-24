@@ -3,7 +3,7 @@
 """
 
 from rest_framework import serializers
-from reservation.models import PaymentModel
+from vendor.models import SupplyModel
 from .vendor import VendorSerializer
 
 class SupplySerializer(serializers.ModelSerializer):
@@ -11,11 +11,11 @@ class SupplySerializer(serializers.ModelSerializer):
     vendor = VendorSerializer()
 
     class Meta:
-        model = PaymentModel
+        model = SupplyModel
         fields = [
             'id', 
-            'vendor', 
-            'channel',
+            'vendor',
+            'description',
             'amount', 
             'status',
             'amount_unpaid',

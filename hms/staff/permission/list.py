@@ -87,6 +87,12 @@ CAN_ADD_COUPON = 'can_add_coupon'
 #
 #This permission is required to view coupon
 CAN_VIEW_COUPON = 'can_view_coupon'
+#
+#This permission is required to override reservation
+CAN_OVERRIDE_RESERVATION = 'can_override_reservation'
+#
+#This permission is required to manage vendor
+CAN_MANAGE_VENDOR = 'can_manage_vendor'
 
 
 """ ADMINISTRATIVE PERMISSIONS """

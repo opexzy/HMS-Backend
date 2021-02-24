@@ -132,7 +132,7 @@ def update_drink(request):
             room.price = data.get("price", None)
             room.metric = data.get("metric", None)
             room.available = data.get("available", None)
-            group = OptionModel.manage.get(pk=data.get('group'))
+            room.group = OptionModel.manage.get(pk=data.get('group'))
             room.save()
             return Response(response_maker(response_type='success',message='Drink updated successfully'),status=HTTP_200_OK)
         except Exception as e:
