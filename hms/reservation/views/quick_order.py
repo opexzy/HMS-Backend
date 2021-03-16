@@ -30,6 +30,8 @@ from bar.serializers import DrinkOrderSerializer
 from decimal import Decimal
 from reservation.exception import QuantityOutOfRange
 from reservation.models import PaymentModel
+from options.models import OptionModel
+from options.serializer import OptionSerializer
 
 """
     Make Quick Order
@@ -194,4 +196,19 @@ def get_my_orders(request):
         "total_food": total_food,
         "food_orders":FoodOrderSerializer(food_order_filter,many=True).data,
         "drink_orders":DrinkOrderSerializer(drink_order_filter,many=True).data
+    }),status=HTTP_200_OK)
+
+
+"""
+    List food and drink group
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept get request
+def list_groups(request):
+    group = OptionModel.manage.all()
+    food_group = group.exclude(name="drink")
+    drink_group = group.exclude(name="food")
+    return Response(response_maker(response_type='success',message='All Payment',data={
+        "food_group": OptionSerializer(food_group, many=True).data,
+        "drink_group": OptionSerializer(drink_group, many=True).data
     }),status=HTTP_200_OK)

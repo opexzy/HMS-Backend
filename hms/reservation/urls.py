@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from reservation.views.invoice import get_invoice, get_payment_report, list_payment, make_payment
-from reservation.views.quick_order import get_my_orders, quick_order
+from reservation.views.quick_order import list_groups, get_my_orders, quick_order
 from .views.reservation_manager import *
 
 urlpatterns = [
@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^payment/list/(?P<page>[0-9]+)$', list_payment,  name="list_page"),
     url(r'^payment/report$', get_payment_report,  name="payment_report"),
     url(r'^my-order-report$', get_my_orders,  name="my_order_report"),
+    url(r'^group$',list_groups, name="list_groups"),
 ]

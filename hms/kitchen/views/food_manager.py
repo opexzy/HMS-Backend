@@ -412,3 +412,17 @@ def get_pending_food_order(request):
             count=count),status=HTTP_200_OK)
     except Exception:
         return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)
+
+"""
+    Get all pending food orders count
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept post request
+def get_food_by_group(request, group_id): 
+    try:
+        group = OptionModel.manage.get(pk=group_id)
+        foods = FoodModel.manage.filter(group=group)
+        return Response(response_maker(response_type='success',message='All Food in Group',
+            data=FoodSerializer(foods, many=True).data),status=HTTP_200_OK)
+    except Exception:
+        return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)

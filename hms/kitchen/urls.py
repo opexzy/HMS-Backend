@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^food/order/update$', update_order, name="update_order"),
     url(r'^food/order/report$',get_order_report, name="order_report"),
     url(r'^food/order/pending$',get_pending_food_order, name="pending_food_order"),
+    url(r'^food/list/group/(?P<group_id>[0-9]+)$', get_food_by_group,  name="list_food_by_group"),
 ]
