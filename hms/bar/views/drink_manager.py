@@ -411,3 +411,19 @@ def get_pending_drink_order(request):
             count=count),status=HTTP_200_OK)
     except Exception:
         return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)
+
+
+
+"""
+    Get all drinks by group
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept post request
+def get_drink_by_group(request, group_id): 
+    try:
+        group = OptionModel.manage.get(pk=group_id)
+        foods = DrinkModel.manage.filter(group=group)
+        return Response(response_maker(response_type='success',message='All Drink in Group',
+            data=DrinkSerializer(foods, many=True).data),status=HTTP_200_OK)
+    except Exception:
+        return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)

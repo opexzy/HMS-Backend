@@ -123,7 +123,59 @@ def make_reservation(request):
     except Exception as e:
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
 
+"""
+    Make New Reservation
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+def make_reservation_mobile(request): 
+    #Copy dict data
+    data = dict(request._POST)
+    #Add new Reservation to database
+    try:
+        with transaction.atomic():
+            staff = StaffModel.objects.get(auth=request.user)
+            reservation = ReservationModel(
+                reservation_type="individual",
+                first_name=data.get('first_name'),
+                last_name=data.get('last_name'),
+                gender=data.get('gender'),
+                phone_number=data.get('phone_number'),
+                created_by=StaffModel.objects.get(auth=request.user),
+                status=ReservationModel.Status.ACTIVE,
+                credit_balance=0,
+            )
+            reservation.save()
+            if data.get("selected_room"):
+                room = RoomModel.manage.get(id=data.get('selected_room'))
 
+                if room.available < 1:
+                    return Response(response_maker(response_type='error',message='This Cabana/Table is not available'),status=HTTP_400_BAD_REQUEST)
+
+                #Add room booking
+                booking = BookingRecordModel(
+                    reservation=reservation,
+                    room=room,
+                    amount=0,
+                    quantity=1,
+                    check_in=datetime.now().date(),
+                    check_out=datetime.now().date() + timedelta(days=1),
+                    booked_by=staff,
+                    payment=None,
+                    status=ReservationModel.Status.ACTIVE
+                )
+                booking.save()
+                #Update available room
+                room.available = room.available - 1
+                room.save()
+            else:
+                return Response(response_maker(response_type='error',message='Please select a Cabana or Table'),status=HTTP_400_BAD_REQUEST)
+        res_serializer = ReservationSerializer(reservation)
+        return Response(response_maker(response_type='success',message="Reservation made successfully",data=res_serializer.data),status=HTTP_200_OK)
+    except KeyError:
+        return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
 """
     List reservation: Can also apply filters
 """
@@ -384,3 +436,14 @@ def override_reservation(request, reference):
         return Response(response_maker(response_type='error',message='Reservation deos not exist or not active'),status=HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+
+
+"""
+    List reservation Mobile: Can apply status filter
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['GET']) #Only accept get request
+def list_reservation_mobile(request, status):
+    reservation_list = ReservationModel.manage.filter(status=status).order_by("-timestamp")
+    res_serializer = ReservationSerializer(reservation_list, many=True)
+    return Response(response_maker(response_type='success', message='All Reservations', data=res_serializer.data),status=HTTP_200_OK)

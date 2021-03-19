@@ -42,11 +42,16 @@ from options.serializer import OptionSerializer
 def quick_order(request, reference): 
     #Copy dict data
     data = request._POST.getlist("orders")
-    #Add new Room to database
+    #Add new Order to database
     try:
         with transaction.atomic():
             reservation = ReservationModel.manage.get(reference=reference, status=ReservationModel.Status.ACTIVE)
             staff = StaffModel.objects.get(auth=request.user)
+
+            if(request._POST.get("client", None)):
+                client = request._POST.get("client")
+            else:
+                client = ""
             #Check payment method
             payment_status = False
             channel = ""
@@ -89,7 +94,7 @@ def quick_order(request, reference):
                 payment.save()
             else:
                 payment = None
-            order_ref = OrderModel(amount=request._POST.get("total_amount"))
+            order_ref = OrderModel(amount=request._POST.get("total_amount"), client=client)
             order_ref.save()        
             #Register order as pending in database
             for order in data:

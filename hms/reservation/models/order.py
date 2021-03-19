@@ -15,6 +15,7 @@ class OrderModel(models.Model):
     order_ref = models.CharField(max_length=8, unique=True, verbose_name="Order Reference")
     amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name="Amount")
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="Timestamp")
+    client = models.CharField(max_length=25, null=True, verbose_name="Client")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args,**kwargs)

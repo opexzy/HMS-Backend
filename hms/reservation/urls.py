@@ -21,4 +21,6 @@ urlpatterns = [
     url(r'^payment/report$', get_payment_report,  name="payment_report"),
     url(r'^my-order-report$', get_my_orders,  name="my_order_report"),
     url(r'^group$',list_groups, name="list_groups"),
+    url(r'^create/mobile$',make_reservation_mobile, name="create_mobile"),
+    url(r'^list/mobile/(?P<status>[a-zA-Z0-9]+)$', list_reservation_mobile,  name="list_mobile"),
 ]
