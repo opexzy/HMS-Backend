@@ -93,6 +93,9 @@ CAN_OVERRIDE_RESERVATION = 'can_override_reservation'
 #
 #This permission is required to manage vendor
 CAN_MANAGE_VENDOR = 'can_manage_vendor'
+#
+#This permission is required to view individual staff sales
+CAN_VIEW_STAFF_SALES = 'can_view_staff_sales'
 
 
 """ ADMINISTRATIVE PERMISSIONS """

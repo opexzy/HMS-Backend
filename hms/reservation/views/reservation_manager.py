@@ -53,24 +53,6 @@ def make_reservation(request):
                 credit_balance=data.get('credit_balance'),
             )
             reservation.save()
-            #Add credit balance payment to history
-            if Decimal(reservation.credit_balance) > Decimal(0) :
-                narration = "Not available"
-                if data.get('credit_channel') == "cash":
-                    narration = "Cash collected by: {} {}".format(staff.first_name, staff.last_name)
-                elif data.get('credit_channel') == "pos":
-                    narration = "Payment made with POS using debit/credit card"
-                elif data.get('credit_channel') == "transfer":
-                    narration = "Customer made bank transfer with reference id/NO: {}".format(request._POST.get("narration"))
-                payment = PaymentModel(
-                    reservation=reservation,
-                    posted_by=staff,
-                    channel=data.get('credit_channel'),
-                    amount=reservation.credit_balance,
-                    status=PaymentModel.Status.COMPLETED,
-                    narration=narration    
-                )
-                payment.save()
 
             if data.get("book_room") == "true":
                 room = RoomModel.manage.get(id=data.get('room'))
@@ -90,7 +72,7 @@ def make_reservation(request):
                     reservation=reservation,
                     posted_by=staff,
                     channel=channel,
-                    amount=float(request._POST.get("total_price")),
+                    amount=float(request._POST.get("total_price")) + float(data.get('credit_balance')),
                     status=PaymentModel.Status.COMPLETED,
                     narration=narration    
                 )
@@ -121,7 +103,7 @@ def make_reservation(request):
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+        return Response(response_maker(response_type='error',message="Unknown internal error"),status=HTTP_400_BAD_REQUEST)
 
 """
     Make New Reservation

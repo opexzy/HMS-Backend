@@ -151,8 +151,11 @@ def quick_order(request, reference):
 @api_view(['POST']) #Only accept get request
 def get_my_orders(request):
     #Copy dict data
-    staff = StaffModel.objects.get(auth=request.user)
     data = request._POST
+    try:
+        staff = StaffModel.objects.get(pk=data.get("staff"))
+    except StaffModel.DoesNotExist:
+        staff = None
 
     # Set order status
     if data.get("status") == 'all':

@@ -14,6 +14,7 @@ class FoodOrderSerializer(serializers.ModelSerializer):
     last_name = serializers.SerializerMethodField("get_last_name")
     food = serializers.SerializerMethodField("get_food")
     placed_by = serializers.SerializerMethodField("get_placed_by")
+    unit_price = serializers.SerializerMethodField("get_unit_price")
     finalized_by = serializers.SerializerMethodField("get_finalized_by")
 
     class Meta:
@@ -26,6 +27,7 @@ class FoodOrderSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'food',
+            'unit_price',
             'amount', 
             'quantity', 
             'placed_by',
@@ -68,6 +70,12 @@ class FoodOrderSerializer(serializers.ModelSerializer):
     def get_food(self, obj):
         if obj.food:
             return obj.food.name
+        else:
+            return None
+    
+    def get_unit_price(self, obj):
+        if obj.food:
+            return obj.food.price
         else:
             return None
 

@@ -60,7 +60,7 @@ def add_food(request):
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+        return Response(response_maker(response_type='error',message="Unknown internal error"),status=HTTP_400_BAD_REQUEST)
 
 
 """
@@ -125,20 +125,20 @@ def update_food(request):
     #Copy dict data
     data = dict(request._POST)
     try:
-        room = FoodModel.manage.get(pk=data.get("id",None))
+        food = FoodModel.manage.get(pk=data.get("id",None))
         try:
-            room.name = data.get("name", None)
-            room.description = data.get("description", None)
-            room.price = data.get("price", None)
-            room.metric = data.get("metric", None)
-            room.available = data.get("available", None)
-            room.group = OptionModel.manage.get(pk=data.get('group'))
-            room.save()
+            food.name = data.get("name", None)
+            food.description = data.get("description", None)
+            food.price = data.get("price", None)
+            food.metric = data.get("metric", None)
+            food.available = data.get("available", None)
+            food.group = OptionModel.manage.get(pk=data.get('group'))
+            food.save()
             return Response(response_maker(response_type='success',message='Food updated successfully'),status=HTTP_200_OK)
         except Exception as e:
-            return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+            return Response(response_maker(response_type='error',message="Unknown internal error"),status=HTTP_400_BAD_REQUEST)
     except FoodModel.DoesNotExist as e:
-        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+        return Response(response_maker(response_type='error',message="Unknown internal error"),status=HTTP_400_BAD_REQUEST)
 
 """
     Order a Food
@@ -194,7 +194,7 @@ def order_food(request):
     except ReservationModel.DoesNotExist:
         return Response(response_maker(response_type='error',message="Reservation is not active or does not exist"),status=HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+        return Response(response_maker(response_type='error',message="Unknown internal error"),status=HTTP_400_BAD_REQUEST)
 
 
 """
@@ -347,7 +347,7 @@ def update_order(request):
     except KeyError:
         return Response(response_maker(response_type='error',message='Bad Request Parameter'),status=HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+        return Response(response_maker(response_type='error',message="Unknown internal error"),status=HTTP_400_BAD_REQUEST)
 
 
 
@@ -396,7 +396,7 @@ def get_order_report(request):
                 "data": order_serializer.data,
             }),status=HTTP_200_OK)
     except Exception as e:
-        return Response(response_maker(response_type='error',message=str(e)),status=HTTP_400_BAD_REQUEST)
+        return Response(response_maker(response_type='error',message="Unknown internal error"),status=HTTP_400_BAD_REQUEST)
 
 
 
@@ -426,3 +426,20 @@ def get_food_by_group(request, group_id):
             data=FoodSerializer(foods, many=True).data),status=HTTP_200_OK)
     except Exception:
         return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)
+
+"""
+    Stock Up Foods
+
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+def stock_up(request):
+    #Copy dict data
+    data = dict(request._POST)
+    try:
+        food = FoodModel.manage.get(id=data.get("id"))
+        food.quantity += int(data.get("id"))
+        food.save()
+        return Response(response_maker(response_type='success',message='Stock updated successfully',status=HTTP_200_OK)
+    except FoodModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message='Unknown Internal Error'),status=HTTP_400_BAD_REQUEST)
+"""

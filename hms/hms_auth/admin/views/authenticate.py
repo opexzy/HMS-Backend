@@ -33,6 +33,9 @@ def login(request):
         if not user:
              return Response({'message': 'Incorrect email or password'},status=HTTP_404_NOT_FOUND)
         else:
+            #Check if account is active
+            if not user.is_active:
+                return Response({'message': 'This account has been decativated, contact Administrator'},status=HTTP_404_NOT_FOUND)
             #Delete previous token from this user
             try:
                 AuthTokenModel.objects.select_related('user').get(user=user).delete()

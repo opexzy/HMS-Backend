@@ -13,6 +13,7 @@ class BookingRecordSerializer(serializers.ModelSerializer):
     first_name = serializers.SerializerMethodField("get_first_name")
     last_name = serializers.SerializerMethodField("get_last_name")
     room = serializers.SerializerMethodField("get_room")
+    unit_price = serializers.SerializerMethodField("get_unit_price")
     booked_by = serializers.SerializerMethodField("get_booked_by")
 
     class Meta:
@@ -25,6 +26,7 @@ class BookingRecordSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'room',
+            'unit_price',
             'amount', 
             'quantity', 
             'check_in', 
@@ -68,6 +70,12 @@ class BookingRecordSerializer(serializers.ModelSerializer):
     def get_room(self, obj):
         if obj.room:
             return obj.room.name
+        else:
+            return None
+
+    def get_unit_price(self, obj):
+        if obj.room:
+            return obj.room.price
         else:
             return None
 

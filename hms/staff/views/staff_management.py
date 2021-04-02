@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from staff.models import staff
 from utils.randstr import get_token
 from utils.api_helper import response_maker, request_data_normalizer, getlistWrapper
-from staff.permission import use_permission, CAN_ADD_STAFF, CAN_VIEW_STAFF, CAN_EDIT_STAFF
+from staff.permission import use_permission, CAN_ADD_STAFF, CAN_VIEW_STAFF, CAN_EDIT_STAFF, CAN_VIEW_STAFF_SALES
 from hms_auth.models import AuthModel
 from staff.models import StaffModel
 from django.db import transaction
@@ -193,3 +193,36 @@ def update_password(request):
             return Response(response_maker(response_type='error',message='Request not understood'),status=HTTP_400_BAD_REQUEST)
     except StaffModel.DoesNotExist:
         return Response(response_maker(response_type='error',message='Request not understood'),status=HTTP_400_BAD_REQUEST)
+
+
+"""
+    Update staff status
+"""
+@request_data_normalizer #Normalize request POST and GET data
+@api_view(['POST']) #Only accept post request
+@use_permission(CAN_EDIT_STAFF) #Only staff that can view a new staff
+def update_status(request): 
+    #Copy dict data
+    data = dict(request._POST)
+    try:
+        auth = AuthModel.manage.get(pk=data.get("auth_id", None))
+        if data.get("status", None) == "active":
+            auth.is_active = True
+            auth.save()
+        else:
+            auth.is_active = False
+            auth.save()
+        return Response(response_maker(response_type='success',message='Status updated successfully'),status=HTTP_200_OK)
+    except AuthModel.DoesNotExist:
+        return Response(response_maker(response_type='error',message='Request not understood'),status=HTTP_400_BAD_REQUEST)
+
+
+"""
+    List All Staffs
+"""
+@api_view(['GET']) #Only accept get request
+@use_permission(CAN_VIEW_STAFF_SALES) #Only staff that can view a new staff
+def all_staffs(request):
+    staffs = StaffModel.objects.all()
+    staff_serializer = StaffSerializer(staffs, many=True)
+    return Response(response_maker(response_type='success',message='All Staffs',data=staff_serializer.data),status=HTTP_200_OK)

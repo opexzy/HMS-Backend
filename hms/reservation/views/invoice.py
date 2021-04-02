@@ -31,6 +31,7 @@ from kitchen.serializers import FoodOrderSerializer
 from room.models import BookingRecordModel
 from room.serializers import RoomSerializer, BookingRecordSerializer
 from decimal import Decimal
+from coupon.models import CouponModel
 
 """
     get Reservation details
@@ -49,6 +50,12 @@ def get_invoice(request, reference):
         drink = drink_orders.aggregate(total_drink=Sum("amount"))
         room = room_bookings.aggregate(total_room=Sum("amount"))
 
+        #Get discount 
+        try:
+            discount = CouponModel.manage.get(reservation=reservation).discount
+        except CouponModel.DoesNotExist:
+            discount = None
+
         res_serializer = ReservationSerializer(reservation)
         food_serializer = FoodOrderSerializer(food_orders, many=True)
         drink_serializer = DrinkOrderSerializer(drink_orders, many=True)
@@ -63,6 +70,7 @@ def get_invoice(request, reference):
                 "total_food":food['total_food'],
                 "total_drink":drink['total_drink'],
                 "total_room":room['total_room'],
+                "discount":discount,
                 "amount_paid": reservation.amount_spent - reservation.amount_unpaid,
                 "amount_unpaid":reservation.amount_unpaid,
             }),status=HTTP_200_OK)

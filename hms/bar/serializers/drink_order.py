@@ -14,6 +14,7 @@ class DrinkOrderSerializer(serializers.ModelSerializer):
     last_name = serializers.SerializerMethodField("get_last_name")
     drink = serializers.SerializerMethodField("get_drink")
     placed_by = serializers.SerializerMethodField("get_placed_by")
+    unit_price = serializers.SerializerMethodField("get_unit_price")
     finalized_by = serializers.SerializerMethodField("get_finalized_by")
 
     class Meta:
@@ -26,6 +27,7 @@ class DrinkOrderSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'drink',
+            'unit_price',
             'amount', 
             'quantity', 
             'placed_by',
@@ -69,6 +71,12 @@ class DrinkOrderSerializer(serializers.ModelSerializer):
     def get_drink(self, obj):
         if obj.drink:
             return obj.drink.name
+        else:
+            return None
+    
+    def get_unit_price(self, obj):
+        if obj.drink:
+            return obj.drink.price
         else:
             return None
 
